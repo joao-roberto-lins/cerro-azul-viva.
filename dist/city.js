@@ -3,7 +3,7 @@
 window.buildCerroAzul = function (T, scene) {
   'use strict';
   const root = new T.Group(); scene.add(root);
-  const obstacles=[], buildings=[], lamps=[], jets=[], pools=[], benches=[], trees=[];
+  const obstacles=[], buildings=[], lamps=[], jets=[], pools=[], benches=[], trees=[], waterways=[];
   const mats=new Map(), boxGeo=new T.BoxGeometry(1,1,1), sphereGeo=new T.SphereGeometry(1,9,7);
   let seed=73127; const rnd=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
   const mat=(c)=>{if(!mats.has(c))mats.set(c,new T.MeshStandardMaterial({color:c,roughness:.88}));return mats.get(c);};
@@ -24,7 +24,7 @@ window.buildCerroAzul = function (T, scene) {
   const grassMat=new T.MeshStandardMaterial({map:grass,roughness:1});
   const tileMat=new T.MeshStandardMaterial({map:roofTex,roughness:.85,side:T.DoubleSide});
   function worldUV(geo,scale=5){const p=geo.attributes.position,uv=[];for(let i=0;i<p.count;i++)uv.push(p.getX(i)/scale,p.getZ(i)/scale);geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));return geo;}
-  function plane(w,d,m,x,z,y=.03,scale=5){const g=new T.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);worldUV(g,scale);const o=mesh(g,m,x,y,z);o.castShadow=false;return o;}
+  function plane(w,d,m,x,z,y=.03,scale=5){const g=new T.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);worldUV(g,scale);const o=mesh(g,m,x,y,z);o.castShadow=false;return o;}\n  function strip(points,width,m,y=.025){for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),s=plane(width,len,m,(a[0]+b[0])/2,(a[1]+b[1])/2,y,3);s.rotation.y=Math.atan2(dx,dz);}waterways.push(points);}
   function shape(points,y,m){const s=new T.Shape();points.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new T.ShapeGeometry(s);g.rotateX(-Math.PI/2);worldUV(g);const o=mesh(g,m,0,y,0);o.castShadow=false;return o;}
   function edge(points,y,c,r=.15,closed=true){for(let i=0;i<points.length-(closed?0:1);i++){const a=points[i],b=points[(i+1)%points.length];line([a[0],y,a[1]],[b[0],y,b[1]],r,c);}}
   function lawn(points){shape(points,.29,grassMat);edge(points,.3,'#d0cbc0',.12);}
@@ -38,6 +38,12 @@ window.buildCerroAzul = function (T, scene) {
   box(56,.22,133,'#b7b6aa',0,.08,0);plane(55.5,132.5,paveMat,0,0,.198,4);
   for(const x of [-27.5,27.5])box(.45,.05,132,'#a76d59',x,.23,0);
   for(const z of [-66,66])box(55,.05,.45,'#a76d59',0,.23,z);
+  // Watercourses shown on the plan are brought into the playable horizon as simplified blue corridors.
+  // They are deliberately kept outside the core walking square and pass beneath the road deck where the survey shows crossings.
+  strip([[-150,-118],[-128,-111],[-108,-114],[-88,-108],[-70,-99],[-58,-88]],7.2,'#2f9ed0',.005);
+  strip([[62,-150],[55,-135],[48,-122],[43,-108],[39,-94],[34,-82]],5.4,'#35a7d6',.004);
+  strip([[-150,118],[-132,119],[-116,125],[-99,133],[-88,145]],8.4,'#2e9ccc',.004);
+
   function crosswalk(x,z,rot){const g=group(x,z,rot);for(let i=-3;i<=3;i++)box(.55,.025,7,'#dfdfcf',i*1.05,.065,0,g);}
   crosswalk(-17,73,0);crosswalk(14,-73,0);crosswalk(-33,-60,Math.PI/2);crosswalk(33,53,Math.PI/2);
   const lawns=[
@@ -204,7 +210,7 @@ window.buildCerroAzul = function (T, scene) {
   const rainCount=180,rainPositions=new Float32Array(rainCount*6);const rainGeo=new T.BufferGeometry();rainGeo.setAttribute('position',new T.BufferAttribute(rainPositions,3));const rainMesh=new T.LineSegments(rainGeo,new T.LineBasicMaterial({color:'#b9dfee',transparent:true,opacity:.56,depthWrite:false}));rainMesh.frustumCulled=false;rainMesh.visible=false;scene.add(rainMesh);
   let lastSeason='',lastWet=null;
   function setSeason(season,wet=false,focus={x:0,z:0}){if(lastSeason!==season){lastSeason=season;const palette={primavera:['#b8c58e','#cfb98b','#b3c595'],verao:['#91b681','#a7bf84','#8caf8b'],outono:['#caa474','#e2bf83','#a88665'],inverno:['#9eada5','#abb6af','#8ea39a']}[season]||['#b8c58e','#cfb98b','#b3c595'];leafMats.forEach((m,i)=>m.color.set(palette[i]));grassMat.color.set({primavera:'#b5c988',verao:'#95b36f',outono:'#b49d73',inverno:'#a6b7a8'}[season]||'#b5c988');}if(lastWet!==wet){lastWet=wet;paveMat.color.set(wet?'#b9c6c8':'#ffffff');roadMat.color.set(wet?'#a8b5b9':'#ffffff');paveMat.roughness=wet?.56:.94;roadMat.roughness=wet?.53:.98;rainMesh.visible=wet;}if(wet){for(let i=0;i<rainCount;i++){const k=i*6,a=(i*13.71+focus.x*2)%135,b=(i*24.83+focus.z*2)%135,y=(i*7.3)%24;rainPositions[k]=focus.x+a-67;rainPositions[k+1]=y;rainPositions[k+2]=focus.z+b-67;rainPositions[k+3]=rainPositions[k]-.12;rainPositions[k+4]=y-.85;rainPositions[k+5]=rainPositions[k+2]+.16;}rainGeo.attributes.position.needsUpdate=true;}}
-  return {obstacles,buildings,lamps,jets,benches,trees,lawns,basinPoints,paveMat,animals,signals,setSeason,update(t,dt=0,isBlocked=()=>false){waterTexture.offset.set(Math.sin(t*.12)*.03,t*.008);jets.forEach((j,i)=>j.material.opacity=.55+Math.sin(t*3+i)*.15);for(const sig of signals){const phase=t%24,active=phase<14?2:phase<17?1:0;sig.bulbs.forEach((b,i)=>b.material.emissiveIntensity=i===active?2:.05);}
+  return {obstacles,buildings,lamps,jets,benches,trees,lawns,basinPoints,waterways,paveMat,animals,signals,setSeason,update(t,dt=0,isBlocked=()=>false){waterTexture.offset.set(Math.sin(t*.12)*.03,t*.008);jets.forEach((j,i)=>j.material.opacity=.55+Math.sin(t*3+i)*.15);for(const sig of signals){const phase=t%24,active=phase<14?2:phase<17?1:0;sig.bulbs.forEach((b,i)=>b.material.emissiveIntensity=i===active?2:.05);}
     if(rainMesh.visible&&dt>0){for(let i=0;i<rainCount;i++){const k=i*6;rainPositions[k+1]-=dt*27;rainPositions[k+4]-=dt*27;if(rainPositions[k+1]<.5){rainPositions[k+1]=21+(i%4);rainPositions[k+4]=rainPositions[k+1]-.85;}}rainGeo.attributes.position.needsUpdate=true;}
     for(const a of animals){const active=Math.sin(t*.35+a.phase)>-.5;if(active&&dt>0){const x=a.x+Math.sin(a.angle)*a.speed*dt,z=a.z+Math.cos(a.angle)*a.speed*dt;if(Math.hypot(x-a.homeX,z-a.homeZ)>4||isBlocked(x,z,.5))a.angle+=dt*4;else{a.x=x;a.z=z;a.g.position.set(x,.24,z);}a.g.rotation.y=a.angle;}a.legs.forEach((l,i)=>l.rotation.x=active?Math.sin(t*7+(i===0||i===3?0:Math.PI))*.4:0);a.tail.rotation.z=Math.sin(t*5+a.phase)*.3;}
     for(const b of birds){const q=t*(b.flight?.3:.07)+b.phase,r=b.flight?20:5;b.g.position.set(6+Math.cos(q)*r,b.flight?14+Math.sin(q*2)*2:.43,38+Math.sin(q)*r);b.g.rotation.y=-q;b.wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*(b.flight?Math.sin(t*10+b.phase)*.65:.15));}
