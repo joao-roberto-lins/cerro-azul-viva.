@@ -176,13 +176,13 @@
   $('touch-jump').onclick=jump;$('transport').onclick=()=>{if(!paused())adventure.transportMenu();};
   for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(!paused())keys.add(b.dataset.key);};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.key);}
   addEventListener('keydown',e=>{
-    if(e.target instanceof HTMLInputElement)return;const key=e.key.toLowerCase();
+    if(e.target instanceof HTMLInputElement)return;if(typeof e.key!=='string')return;const key=e.key.toLowerCase();
     if(!paused()&&[' ','arrowup','arrowdown','arrowleft','arrowright'].includes(key))e.preventDefault();
     if(e.repeat)return;
     if(key==='p'){if($('pause-dialog').open)closeDialog('pause-dialog');else if(started&&!paused()){save();openDialog('pause-dialog');}return;}
     if(paused())return;keys.add(key);if(key==='e')interact();if(key===' ')jump();if(key==='c')setCamera();if(key==='m')toggleMap();if(key==='f')takePhoto();if(key==='v')adventure.setTransport(state.transport==='bike'?'walk':'bike');if(key==='r')toggleRain();
   });
-  addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>{keys.clear();save();});addEventListener('pagehide',save);
+  addEventListener('keyup',e=>{if(typeof e.key!=='string')return;keys.delete(e.key.toLowerCase());});addEventListener('blur',()=>{keys.clear();save();});addEventListener('pagehide',save);
   document.addEventListener('visibilitychange',()=>{keys.clear();if(document.hidden)save();});
   $('welcome').addEventListener('cancel',e=>e.preventDefault());
   document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>keys.clear()));
