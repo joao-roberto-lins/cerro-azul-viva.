@@ -1,0 +1,16 @@
+{
+  "name": "cerro-azul-viva",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-online.cjs",
+    "test": "node --test test/*.test.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "esbuild": "0.28.2"
+  }
+}

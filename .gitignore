@@ -1,0 +1,8 @@
+Cerro Azul Viva.html
+node_modules/
+.vercel/
+.env*
+!.env.example
+*.zip
+Cerro Azul Viva - Nivel 2.html
+.openai/
