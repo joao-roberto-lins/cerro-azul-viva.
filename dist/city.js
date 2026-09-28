@@ -15,7 +15,7 @@ window.buildCerroAzul = function (T, scene) {
   function block(x,z,w,d){obstacles.push({x,z,w,d});}
   function line(a,b,r,c,p=root){const v=new T.Vector3(...a),q=new T.Vector3(...b),o=cyl(r,r,v.distanceTo(q),c,0,0,0,p,7);o.position.copy(v.add(q).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),q.sub(new T.Vector3(...a)).normalize());return o;}
   function canvasTexture(draw,size=512){const c=document.createElement('canvas');c.width=c.height=size;draw(c.getContext('2d'),size);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;return t;}
-  const paver=canvasTexture((c,n)=>{c.fillStyle='#8c928e';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=32)for(let x=-32;x<n;x+=64){const a=x+(y/32%2)*32;const v=160+rnd()*28;c.fillStyle=`rgb(${v},${v+2},${v-3})`;c.fillRect(a+1,y+1,62,30);c.fillStyle='#ffffff20';c.fillRect(a+3,y+3,57,2);}for(let i=0;i<12000;i++){c.fillStyle=rnd()<.5?'#ffffff10':'#0000000c';c.fillRect(rnd()*n,rnd()*n,1.5,1.5);}});
+  const paver=canvasTexture((c,n)=>{c.fillStyle='#c9cbc7';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=32)for(let x=-32;x<n;x+=64){const a=x+(y/32%2)*32;const v=188+rnd()*28;c.fillStyle=`rgb(${v},${v+3},${v-2})`;c.fillRect(a+1,y+1,62,30);c.fillStyle='#ffffff20';c.fillRect(a+3,y+3,57,2);}for(let i=0;i<12000;i++){c.fillStyle=rnd()<.5?'#ffffff10':'#0000000c';c.fillRect(rnd()*n,rnd()*n,1.5,1.5);}});
   const stone=canvasTexture((c,n)=>{c.fillStyle='#777d77';c.fillRect(0,0,n,n);for(let y=-1;y<12;y++)for(let x=-1;x<11;x++){const px=x*55+(y%2)*27.5,py=y*47.6,v=122+rnd()*35;c.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3;c.lineTo(px+30*Math.sin(a),py+30*Math.cos(a));}c.closePath();c.fillStyle=`rgb(${v+6},${v+6},${v})`;c.fill();c.strokeStyle='#6d746d';c.lineWidth=2;c.stroke();}for(let i=0;i<15000;i++){c.fillStyle=rnd()<.5?'#fff1':'#0001';c.fillRect(rnd()*n,rnd()*n,1,1);}});
   const grass=canvasTexture((c,n)=>{c.fillStyle='#658047';c.fillRect(0,0,n,n);for(let i=0;i<34000;i++){c.fillStyle=['#455f3030','#a1ad5135','#314a3420','#abb87026'][i%4];c.fillRect(rnd()*n,rnd()*n,1+rnd()*3,2+rnd()*5);}});
   const roofTex=canvasTexture((c,n)=>{c.fillStyle='#a46145';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=48)for(let x=0;x<n;x+=22){const v=128+rnd()*36;c.fillStyle=`rgb(${v+35},${v-42},${v-68})`;c.fillRect(x+1,y+2,20,45);c.fillStyle='#f3b18355';c.fillRect(x+4,y+2,4,43);c.fillStyle='#482d2633';c.fillRect(x+17,y+2,3,46);}});
@@ -73,26 +73,47 @@ window.buildCerroAzul = function (T, scene) {
   // Narrower, irregular grass islands leave broader stone paths like the supplied views.
   lawns.forEach((island,k)=>{const cx=island.reduce((n,p)=>n+p[0],0)/island.length,cz=island.reduce((n,p)=>n+p[1],0)/island.length;lawns[k]=island.map(([x,z],i)=>[cx+(x-cx)*(.69+(i%3)*.025),cz+(z-cz)*(.72+(i%2)*.035)]);lawn(lawns[k]);});
   for(const [x,z] of [[-4,-42],[20,-38],[-19,-24],[13,33],[18,20],[-15,27]]){const bed=[[x-2,z-1],[x+1.7,z-1.5],[x+2,z+.6],[x-1,z+1.4]];lawn(bed);for(let i=0;i<10;i++){const xx=x+(rnd()-.5)*3,zz=z+(rnd()-.5)*2;ball(xx,.51,zz,.11,.16,.11,['#eabf55','#e6a6ac','#eee5c6'][i%3]);}}
-  // The fountain follows the curved footprint in Animação2.mp4, viewed from its south end.
-  const fountainShape=new T.Shape();fountainShape.moveTo(-24,-61);fountainShape.lineTo(-9,-61);fountainShape.bezierCurveTo(-13,-58,-19,-57,-19,-51);fountainShape.bezierCurveTo(-19,-45,-11,-42,-14,-38);fountainShape.bezierCurveTo(-17,-35,-23,-39,-24,-44);fountainShape.lineTo(-24,-61);
-  const basinPoints=fountainShape.getPoints(40).map(v=>[v.x,-v.y]);
-  const basinGeo=new T.ShapeGeometry(fountainShape,48);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
-  const basin=mesh(basinGeo,'#258ab9',0,.30,0);basin.castShadow=false;
-  edge(basinPoints,.38,'#aeaaa0',.25);
-  const waterTexture=canvasTexture((c,n)=>{c.fillStyle='#63c1d4';c.fillRect(0,0,n,n);c.strokeStyle='#d8fdff70';c.lineWidth=1.5;for(let i=0;i<40;i++){c.beginPath();const x=rnd()*n,y=rnd()*n;c.ellipse(x,y,8+rnd()*34,4+rnd()*17,rnd()*6,0,Math.PI*2);c.stroke();}});
-  const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#6ec4d8',metalness:.25,roughness:.24,transparent:true,opacity:.87});
-  const water=mesh(basinGeo,waterMat,0,.37,0);water.castShadow=false;pools.push(waterMat);
-  for(let i=0;i<7;i++){const x=-22.15+Math.sin(i*.7)*.7,z=43+i*2.55;block(x,z,3.2,2.8);const pts=[];for(let k=0;k<13;k++){const t=k/12;pts.push(new T.Vector3(x+t*1.5,.46+Math.sin(t*Math.PI)*1.2,z));}const jet=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),12,.038,5,false),new T.MeshStandardMaterial({color:'#ccf3fa',transparent:true,opacity:.7,roughness:.18}));jets.push(jet);}
-  block(-18,59.8,8,3);block(-16.8,40.1,7,3.5);
-  const innerIsland=[[-17,45],[-15,42],[-9,44],[-7,50],[-4,58],[-8,60],[-15,57],[-17,52]];lawn(innerIsland);
+  // Praça modelada a partir de Animação2.mp4: espelho d'água alongado, ilha verde, pergolado e balanço.
+  const fountainShape=new T.Shape();
+  fountainShape.moveTo(-25,-61);
+  fountainShape.bezierCurveTo(-18,-61,-8,-60,-5,-56);
+  fountainShape.bezierCurveTo(-2,-52,-4,-45,-7,-39);
+  fountainShape.bezierCurveTo(-10,-34,-18,-33,-23,-36);
+  fountainShape.bezierCurveTo(-27,-39,-29,-45,-29,-51);
+  fountainShape.bezierCurveTo(-29,-56,-28,-59,-25,-61);
+  fountainShape.closePath();
+  const basinPoints=fountainShape.getPoints(56).map(v=>[v.x,-v.y]);
+  const basinGeo=new T.ShapeGeometry(fountainShape,72);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
+  const basin=mesh(basinGeo,'#2c6f85',0,.28,0);basin.castShadow=false;
+  edge(basinPoints,.36,'#4a4f50',.34);
+
+  const waterTexture=canvasTexture((c,n)=>{c.fillStyle='#69c6e6';c.fillRect(0,0,n,n);c.strokeStyle='#e6fbff66';c.lineWidth=1.8;for(let i=0;i<55;i++){c.beginPath();const x=rnd()*n,y=rnd()*n;c.ellipse(x,y,10+rnd()*42,4+rnd()*20,rnd()*6,0,Math.PI*2);c.stroke();}});
+  const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#72cce8',metalness:.18,roughness:.18,transparent:true,opacity:.9});
+  const water=mesh(basinGeo,waterMat,0,.36,0);water.castShadow=false;pools.push(waterMat);
+
+  // Ilha gramada central visível na modelagem.
+  const innerIsland=[[-19,45],[-16,40],[-9,39],[-5,43],[-5,51],[-10,57],[-17,58],[-21,54]];
+  lawn(innerIsland);
+  edge(innerIsland,.40,'#d6d2c4',.18);
+
+  // Pergolado de madeira sobre a ilha.
   const pergola=group(-12,49);
-  for(const x of [-2.2,2.2])for(const z of [-2.3,2.3]){box(.25,3.9,.25,'#62422e',x,2.15,z,pergola);block(-12+x,49+z,.28,.28);}
-  for(const x of [-2.25,2.25])box(.23,.35,5.7,'#795138',x,4.0,0,pergola);
-  for(let z=-2.65;z<=2.7;z+=.49)box(5.35,.22,.16,'#98663e',0,4.2,z,pergola);
-  for(let x=-10;x<-5;x+=1.4)box(1.18,.1,1.2,'#e4e0d4',x,.35,50);
+  for(const x of [-2.4,2.4])for(const z of [-2.25,2.25]){box(.28,4.15,.28,'#734626',x,2.25,z,pergola);block(-12+x,49+z,.32,.32);}
+  for(const x of [-2.45,2.45])box(.30,.36,5.8,'#7c4c2b',x,4.25,0,pergola);
+  for(let z=-2.65;z<=2.7;z+=.48)box(5.55,.20,.18,'#9b663b',0,4.48,z,pergola);
+
+  // Balanço/banco suspenso do vídeo.
+  for(const x of [-1.55,1.55]){line([x,4.18,-.15],[x,1.55,-.15],.025,'#585a55',pergola);line([x,4.18,.35],[x,1.55,.35],.025,'#585a55',pergola);}
+  box(3.7,.18,1.05,'#6f4b31',0,1.43,.10,pergola);
+  box(3.7,.16,.18,'#8a5c39',0,1.95,.58,pergola);
+  for(const x of [-1.6,1.6])line([x,1.43,.55],[x,1.95,.58],.045,'#555b55',pergola);
+  block(-12,49,4.2,1.5);
+
+  // Pequeno passeio de acesso ao pergolado.
+  plane(3.0,7.0,paveMat,-12,55.2,.32,3);
   // Raised, transparent lettering, matching the blue letters in the street photographs.
   const letterCanvas=document.createElement('canvas');letterCanvas.width=2048;letterCanvas.height=256;const lc=letterCanvas.getContext('2d');lc.font='900 181px Arial';lc.textBaseline='middle';lc.lineWidth=10;lc.strokeStyle='#fff';lc.fillStyle='#1678aa';lc.strokeText('EU',8,130);lc.fillText('EU',8,130);lc.fillStyle='#dc3b48';lc.strokeText('♥',315,130);lc.fillText('♥',315,130);lc.fillStyle='#1678aa';lc.strokeText('CERRO AZUL',530,130,1500);lc.fillText('CERRO AZUL',530,130,1500);
-  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;mesh(new T.PlaneGeometry(17.4,2.1),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.3,side:T.DoubleSide,roughness:.58}),-12,1.53,63.2);box(18,.35,.95,'#eee9dc',-12,.4,63.2);block(-12,63.2,18,1);
+  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;mesh(new T.PlaneGeometry(17.4,2.1),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.3,side:T.DoubleSide,roughness:.58}),-12,1.48,63.0);box(18.8,.42,1.15,'#deddd7',-12,.42,63.0);box(18.2,.10,1.25,'#555a59',-12,.18,63.0);block(-12,63.0,18.8,1.2);
   function bench(x,z,rot=0,concrete=false){const g=group(x,z,rot);const wood=concrete?'#d4d4c9':'#6d4d35';for(let k=0;k<4;k++)box(2.7,.075,.16,wood,0,.77,-.3+k*.2,g);for(let k=0;k<3;k++)box(2.7,.14,.075,wood,0,1.03+k*.18,-.4,g);for(const a of [-1.0,1.0]){box(.18,.55,.8,concrete?'#b4b6ad':'#374a40',a,.48,0,g);box(.11,1.13,.11,'#425047',a,.81,-.42,g);line([a,.78,.35],[a,1.14,.22],.045,'#344039',g);line([a,1.14,.22],[a,1.14,-.4],.045,'#344039',g);}block(x,z,Math.abs(Math.cos(rot))>.5?2.8:1.0,Math.abs(Math.cos(rot))>.5?1:2.8);benches.push({x:x+Math.sin(rot)*1.6,z:z+Math.cos(rot)*1.6});}
   bench(-12,48.5,0,true);for(const a of [[-23,28,1.57],[22,30,-1.57],[-3,39,3.14],[7,-30,0],[-23,-47,1.57],[23,-53,-1.57],[13,18,0],[-18,-25,0],[-3,-55,0]])bench(...a);
   // Red concrete skate ramps on the west side, visible in captures 647–651.
@@ -100,8 +121,17 @@ window.buildCerroAzul = function (T, scene) {
   function ramp(x,z,rot){const g=group(x,z,rot),s=new T.Shape();s.moveTo(-2.2,0);s.lineTo(2.2,0);s.lineTo(2.2,1.65);s.bezierCurveTo(1.6,1.65,.7,.15,-2.2,.15);s.closePath();const geo=new T.ExtrudeGeometry(s,{depth:5.5,bevelEnabled:false,curveSegments:20});const o=mesh(geo,'#b6514c',0,.22,-2.75,g);o.rotation.y=Math.PI/2;block(x,z,6,4.5);}
   ramp(-16,-8,0);ramp(-16,8,Math.PI);box(1.6,.45,6,'#b95b50',-16,.45,0);block(-16,0,1.6,6);line([-11,.95,-4],[-11,.95,4],.06,'#767d7a');for(const z of [-3.5,3.5])line([-11,.25,z],[-11,.95,z],.06,'#767d7a');
   // Small municipal building near the southern entry.
-  const kiosk=group(19,53);box(9,3.8,7,'#dad7c2',0,2.1,0,kiosk);box(9.4,.35,7.4,'#9d9e91',0,4.1,0,kiosk);box(9,.7,7.02,'#858d84',0,.55,0,kiosk);box(4,1.3,.05,'#284b51',0,2.4,3.52,kiosk);for(const x of [-2,0,2])box(.1,1.45,.1,'#eef1e4',x,2.4,3.56,kiosk);box(1.4,2.5,.06,'#a6aca3',-3.1,1.55,3.55,kiosk);sign('FISCALIZAÇÃO MUNICIPAL',8,.65,0,3.55,3.54,kiosk);block(19,53,9,7);buildings.push({x:19,z:53,w:9,d:7,color:'#d4cfb4'});
+  const kiosk=group(19,53);box(9,3.8,7,'#36a348',0,2.1,0,kiosk);box(9.4,.35,7.4,'#2d6f3e',0,4.1,0,kiosk);box(9,.7,7.02,'#2f7c43',0,.55,0,kiosk);box(4.6,1.45,.07,'#263e3d',0,2.35,3.53,kiosk);for(const x of [-2.2,0,2.2])box(.12,1.55,.12,'#e9efe6',x,2.35,3.58,kiosk);box(1.5,2.55,.07,'#d5d9cf',-3.15,1.55,3.56,kiosk);sign('FISCALIZAÇÃO MUNICIPAL',8,.65,0,3.55,3.54,kiosk,'#2d6f3e','#fff8df');block(19,53,9,7);buildings.push({x:19,z:53,w:9,d:7,color:'#36a348'});
   const clock=group(2,58);box(.4,5.7,.4,'#b86a3d',0,3.0,0,clock);box(1.8,2.5,.4,'#e88535',0,5.8,0,clock);sign('23°',1.5,.8,0,5.9,.23,clock,'#182c28','#b4df99');sign('CERRO AZUL',1.5,.35,0,6.7,.23,clock,'#36895d','#fff');block(2,58,.5,.5);
+  // Canteiro circular com árvore e mobiliário periférico presentes na animação.
+  const roundPlanter=group(8,35);
+  cyl(3.4,3.4,.38,'#c4c2b8',0,.35,0,roundPlanter,32);
+  cyl(2.9,2.9,.42,'#6f8c50',0,.42,0,roundPlanter,32);
+  block(8,35,5.8,5.8);
+  bench(-24,48,Math.PI/2,true);
+  bench(24,48,-Math.PI/2,true);
+  bench(-24,20,Math.PI/2,true);
+  bench(24,18,-Math.PI/2,true);
   const billboard=group(-26,62);box(.3,5.3,.3,'#454846',0,2.9,0,billboard);box(4.7,2.4,.18,'#252e33',0,5.5,0,billboard);sign('VIVA A PRAÇA',4.3,.5,0,5.5,.1,billboard,'#252e33','#e7e9e4');
   const northKiosk=group(-18,-52);box(6,2.9,5,'#d8cfb1',0,1.7,0,northKiosk);const kr=hipped(7,6,1.25,0,3.2,0,northKiosk);kr.material=mat('#57704d');box(3,.95,.08,'#3a5251',0,2.2,2.54,northKiosk);block(-18,-52,6,5);
   // Pavilion-style playground, scaled from the aerial layout.
