@@ -1,5 +1,5 @@
-/* Cerro Azul central area. Geometry revised from the user's SET/2023 georeferenced planialtimetric survey (scale 1:500).
-   North is -Z. The survey governs street/plaza proportions; gameplay details remain simplified. */
+/* Rebuilt from the user's jogo.rar: aerial image, street photographs and fountain flythrough.
+   North is -Z. Dimensions are visual estimates, not a cadastral survey. */
 window.buildCerroAzul = function (T, scene) {
   'use strict';
   const root = new T.Group(); scene.add(root);
@@ -32,24 +32,26 @@ window.buildCerroAzul = function (T, scene) {
   function roof(w,d,h,x,y,z,p=root){const g=new T.BufferGeometry();const v=[-w/2,0,-d/2,w/2,0,-d/2,0,h,-d/2,-w/2,0,d/2,0,h,d/2,w/2,0,d/2,-w/2,0,-d/2,0,h,-d/2,0,h,d/2,-w/2,0,-d/2,0,h,d/2,-w/2,0,d/2,w/2,0,-d/2,w/2,0,d/2,0,h,d/2,w/2,0,-d/2,0,h,d/2,0,h,-d/2];g.setAttribute('position',new T.Float32BufferAttribute(v,3));g.computeVertexNormals();worldUV(g,4);return mesh(g,tileMat,x,y,z,p);}
   function hipped(w,d,h,x,y,z,p){const g=new T.BufferGeometry(),a=[-w/2,0,-d/2],b=[w/2,0,-d/2],c=[w/2,0,d/2],e=[-w/2,0,d/2],q=[0,h,0];g.setAttribute('position',new T.Float32BufferAttribute([...a,...b,...q,...b,...c,...q,...c,...e,...q,...e,...a,...q],3));g.computeVertexNormals();worldUV(g,4);return mesh(g,tileMat,x,y,z,p);}
   function sign(text,w,h,x,y,z,p=root,bg='#eee9df',fg='#283e4a'){const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,1024,256);ctx.fillStyle=fg;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='600 96px Arial';ctx.fillText(text,512,133,980);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;const s=mesh(new T.PlaneGeometry(w,h),new T.MeshStandardMaterial({map:tex,roughness:.8,side:T.DoubleSide}),x,y,z,p);s.castShadow=false;return s;}
-  // Base viária e Praça Monsenhor Celso, proporcionadas pela prancha planialtimétrica de 2023.
-  plane(950,950,grassMat,0,0,-.13,8);
+  // Terrain and street framework adjusted from the user's 2023 plan.
+  // Fountain, plaza landscaping, furniture and buildings are intentionally unchanged.
+  plane(950,950,grassMat,0,0,-.13,8);plane(285,330,paveMat,0,0,-.04);
 
-  // Praça: a prancha mostra um retângulo mais largo que a versão anterior.
-  box(70,.22,124,'#b7b6aa',0,.08,0);
-  plane(69.5,123.5,paveMat,0,0,.198,4);
-  for(const x of [-34.7,34.7])box(.45,.05,124,'#a76d59',x,.23,0);
-  for(const z of [-61.7,61.7])box(69.5,.05,.45,'#a76d59',0,.23,z);
+  // Main north-south streets flanking the plaza.
+  plane(10.5,325,roadMat,-33,0,.01,4); // Rua Carlos Gomes
+  plane(10.5,325,roadMat,33,0,.01,4);  // Av. Getúlio Vargas
 
-  // Vias que contornam a praça e conexões imediatamente visíveis na prancha.
-  plane(10.8,250,roadMat,-40,3,.012,4);      // Rua Carlos Gomes
-  plane(10.8,335,roadMat,40,-30,.012,4);     // Av. Getúlio Vargas
-  plane(210,10.8,roadMat,10,-69,.014,4);     // eixo norte / Mal. Floriano Peixoto
-  plane(195,10.8,roadMat,-18,69,.014,4);     // eixo sul
-  plane(10.8,120,roadMat,0,129,.012,4);      // continuação sul
-  plane(145,10.8,roadMat,108,-69,.014,4);    // prolongamento leste
-  plane(10.8,95,roadMat,-93,-114,.012,4);    // ligação noroeste
-  plane(112,10.8,roadMat,-88,-135,.014,4);   // transversal noroeste
+  // Cross streets and continuations visible on the plan.
+  plane(275,10.5,roadMat,0,-73,.015,4);
+  plane(275,10.5,roadMat,0,73,.015,4);
+  plane(10.5,130,roadMat,-95,-65,.01,4);
+  plane(10.5,160,roadMat,95,10,.01,4);
+  plane(150,10.5,roadMat,-70,-135,.015,4);
+  plane(135,10.5,roadMat,-75,135,.015,4);
+  plane(120,10.5,roadMat,88,-73,.016,4);
+
+  box(56,.22,133,'#b7b6aa',0,.08,0);plane(55.5,132.5,paveMat,0,0,.198,4);
+  for(const x of [-27.5,27.5])box(.45,.05,132,'#a76d59',x,.23,0);
+  for(const z of [-66,66])box(55,.05,.45,'#a76d59',0,.23,z);
   // Watercourses shown on the plan are brought into the playable horizon as simplified blue corridors.
   // They are deliberately kept outside the core walking square and pass beneath the road deck where the survey shows crossings.
   strip([[-150,-118],[-128,-111],[-108,-114],[-88,-108],[-70,-99],[-58,-88]],7.2,'#2f9ed0',.005);
@@ -59,55 +61,38 @@ window.buildCerroAzul = function (T, scene) {
   function crosswalk(x,z,rot){const g=group(x,z,rot);for(let i=-3;i<=3;i++)box(.55,.025,7,'#dfdfcf',i*1.05,.065,0,g);}
   crosswalk(-17,73,0);crosswalk(14,-73,0);crosswalk(-33,-60,Math.PI/2);crosswalk(33,53,Math.PI/2);
   const lawns=[
-    // faixa norte: pequenos canteiros e núcleos arborizados
-    [[-29,-56],[-18,-57],[-14,-48],[-19,-40],[-29,-42]],
-    [[-10,-57],[6,-57],[10,-49],[4,-40],[-8,-42]],
-    [[12,-57],[29,-57],[29,-43],[21,-38],[12,-45]],
-    [[-29,-36],[-18,-38],[-10,-29],[-16,-19],[-29,-21]],
-    [[-8,-36],[7,-39],[15,-30],[9,-19],[-2,-22],[-11,-29]],
-    [[17,-34],[29,-39],[29,-18],[22,-11],[13,-18]],
-    // miolo: caminhos diagonais largos, como na prancha
-    [[-29,-13],[-16,-16],[-8,-6],[-13,8],[-28,6]],
-    [[-6,-16],[8,-13],[17,-4],[10,8],[-1,5]],
-    [[18,-8],[29,-12],[29,12],[19,17],[11,7]],
-    // metade sul: grandes ilhas triangulares separadas pelas diagonais
-    [[-29,13],[-15,11],[-5,21],[-14,39],[-29,34]],
-    [[-8,13],[5,11],[14,21],[7,39],[-3,34],[-13,24]],
-    [[16,20],[29,14],[29,39],[18,45],[9,38]],
-    [[-29,40],[-16,43],[-10,55],[-29,57]],
-    [[-7,43],[8,42],[16,54],[10,58],[-3,57]],
-    [[18,48],[29,42],[29,58],[16,58]]
+    [[-24,-62],[-8,-62],[-8,-48],[-21,-34],[-24,-36]],
+    [[-3,-62],[23,-62],[23,-46],[10,-32],[-3,-43]],
+    [[-23,-30],[-8,-45],[-6,-32],[7,-22],[-4,-10],[-23,-17]],
+    [[24,-39],[24,-18],[15,-14],[6,-22]],
+    [[-24,20],[-13,20],[-5,33],[-8,38],[-24,34]],
+    [[12,22],[23,14],[24,40],[16,39],[7,31]],
+    [[4,1],[8,-9],[23,-10],[23,7],[14,16],[8,15]],
+    [[-1,-6],[5,6],[2,17],[-4,26],[-10,17],[-12,8]]
   ];
-  // Polígonos já foram traçados com os vazios de circulação da prancha; não reduzir novamente.
-  lawns.forEach(lawn);
-  for(const [x,z] of [[-22,-50],[-3,-49],[20,-47],[-20,-27],[4,-28],[22,-25],[-20,26],[2,27],[20,31],[-8,51]]){const bed=[[x-1.6,z-.8],[x+1.4,z-1.0],[x+1.7,z+.6],[x-1.2,z+1.1]];lawn(bed);for(let i=0;i<7;i++){const xx=x+(rnd()-.5)*2.5,zz=z+(rnd()-.5)*1.6;ball(xx,.51,zz,.10,.15,.10,['#eabf55','#e6a6ac','#eee5c6'][i%3]);}}
-  // Fonte da praça: posição e contorno reconstruídos a partir da prancha (setor sudoeste, próximo ao acesso sul).
-  const fountainShape=new T.Shape();
-  fountainShape.moveTo(-29,-58);
-  fountainShape.bezierCurveTo(-27,-56,-24,-54,-21,-53);
-  fountainShape.bezierCurveTo(-17,-51,-14,-47,-15,-43);
-  fountainShape.bezierCurveTo(-16,-39,-21,-37,-25,-39);
-  fountainShape.bezierCurveTo(-29,-41,-31,-46,-31,-51);
-  fountainShape.bezierCurveTo(-31,-54,-30,-57,-29,-58);
-  fountainShape.closePath();
-  const basinPoints=fountainShape.getPoints(48).map(v=>[v.x,-v.y]);
-  const basinGeo=new T.ShapeGeometry(fountainShape,64);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
-  const basin=mesh(basinGeo,'#168fc7',0,.30,0);basin.castShadow=false;
-  edge(basinPoints,.39,'#ded8c8',.30);
+  // Narrower, irregular grass islands leave broader stone paths like the supplied views.
+  lawns.forEach((island,k)=>{const cx=island.reduce((n,p)=>n+p[0],0)/island.length,cz=island.reduce((n,p)=>n+p[1],0)/island.length;lawns[k]=island.map(([x,z],i)=>[cx+(x-cx)*(.69+(i%3)*.025),cz+(z-cz)*(.72+(i%2)*.035)]);lawn(lawns[k]);});
+  for(const [x,z] of [[-4,-42],[20,-38],[-19,-24],[13,33],[18,20],[-15,27]]){const bed=[[x-2,z-1],[x+1.7,z-1.5],[x+2,z+.6],[x-1,z+1.4]];lawn(bed);for(let i=0;i<10;i++){const xx=x+(rnd()-.5)*3,zz=z+(rnd()-.5)*2;ball(xx,.51,zz,.11,.16,.11,['#eabf55','#e6a6ac','#eee5c6'][i%3]);}}
+  // The fountain follows the curved footprint in Animação2.mp4, viewed from its south end.
+  const fountainShape=new T.Shape();fountainShape.moveTo(-24,-61);fountainShape.lineTo(-9,-61);fountainShape.bezierCurveTo(-13,-58,-19,-57,-19,-51);fountainShape.bezierCurveTo(-19,-45,-11,-42,-14,-38);fountainShape.bezierCurveTo(-17,-35,-23,-39,-24,-44);fountainShape.lineTo(-24,-61);
+  const basinPoints=fountainShape.getPoints(40).map(v=>[v.x,-v.y]);
+  const basinGeo=new T.ShapeGeometry(fountainShape,48);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
+  const basin=mesh(basinGeo,'#258ab9',0,.30,0);basin.castShadow=false;
+  edge(basinPoints,.38,'#aeaaa0',.25);
   const waterTexture=canvasTexture((c,n)=>{c.fillStyle='#63c1d4';c.fillRect(0,0,n,n);c.strokeStyle='#d8fdff70';c.lineWidth=1.5;for(let i=0;i<40;i++){c.beginPath();const x=rnd()*n,y=rnd()*n;c.ellipse(x,y,8+rnd()*34,4+rnd()*17,rnd()*6,0,Math.PI*2);c.stroke();}});
   const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#6ec4d8',metalness:.25,roughness:.24,transparent:true,opacity:.87});
   const water=mesh(basinGeo,waterMat,0,.37,0);water.castShadow=false;pools.push(waterMat);
-  for(let i=0;i<5;i++){const x=-27.3+i*2.2,z=49.2+Math.sin(i*.8)*1.8;block(x,z,1.0,1.0);const pts=[];for(let k=0;k<13;k++){const t=k/12;pts.push(new T.Vector3(x,.46+Math.sin(t*Math.PI)*1.25,z+t*.45));}const jet=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),12,.042,5,false),new T.MeshStandardMaterial({color:'#d6f7ff',transparent:true,opacity:.78,roughness:.16}));jets.push(jet);}
+  for(let i=0;i<7;i++){const x=-22.15+Math.sin(i*.7)*.7,z=43+i*2.55;block(x,z,3.2,2.8);const pts=[];for(let k=0;k<13;k++){const t=k/12;pts.push(new T.Vector3(x+t*1.5,.46+Math.sin(t*Math.PI)*1.2,z));}const jet=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),12,.038,5,false),new T.MeshStandardMaterial({color:'#ccf3fa',transparent:true,opacity:.7,roughness:.18}));jets.push(jet);}
   block(-18,59.8,8,3);block(-16.8,40.1,7,3.5);
   const innerIsland=[[-17,45],[-15,42],[-9,44],[-7,50],[-4,58],[-8,60],[-15,57],[-17,52]];lawn(innerIsland);
-  const pergola=group(18,-49);
-  for(const x of [-2.2,2.2])for(const z of [-2.3,2.3]){box(.25,3.9,.25,'#62422e',x,2.15,z,pergola);block(18+x,-49+z,.28,.28);}
+  const pergola=group(-12,49);
+  for(const x of [-2.2,2.2])for(const z of [-2.3,2.3]){box(.25,3.9,.25,'#62422e',x,2.15,z,pergola);block(-12+x,49+z,.28,.28);}
   for(const x of [-2.25,2.25])box(.23,.35,5.7,'#795138',x,4.0,0,pergola);
   for(let z=-2.65;z<=2.7;z+=.49)box(5.35,.22,.16,'#98663e',0,4.2,z,pergola);
   for(let x=-10;x<-5;x+=1.4)box(1.18,.1,1.2,'#e4e0d4',x,.35,50);
   // Raised, transparent lettering, matching the blue letters in the street photographs.
   const letterCanvas=document.createElement('canvas');letterCanvas.width=2048;letterCanvas.height=256;const lc=letterCanvas.getContext('2d');lc.font='900 181px Arial';lc.textBaseline='middle';lc.lineWidth=10;lc.strokeStyle='#fff';lc.fillStyle='#1678aa';lc.strokeText('EU',8,130);lc.fillText('EU',8,130);lc.fillStyle='#dc3b48';lc.strokeText('♥',315,130);lc.fillText('♥',315,130);lc.fillStyle='#1678aa';lc.strokeText('CERRO AZUL',530,130,1500);lc.fillText('CERRO AZUL',530,130,1500);
-  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;mesh(new T.PlaneGeometry(17.4,2.1),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.3,side:T.DoubleSide,roughness:.58}),-2,1.53,58.5);box(18,.35,.95,'#eee9dc',-2,.4,58.5);block(-2,58.5,18,1);
+  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;mesh(new T.PlaneGeometry(17.4,2.1),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.3,side:T.DoubleSide,roughness:.58}),-12,1.53,63.2);box(18,.35,.95,'#eee9dc',-12,.4,63.2);block(-12,63.2,18,1);
   function bench(x,z,rot=0,concrete=false){const g=group(x,z,rot);const wood=concrete?'#d4d4c9':'#6d4d35';for(let k=0;k<4;k++)box(2.7,.075,.16,wood,0,.77,-.3+k*.2,g);for(let k=0;k<3;k++)box(2.7,.14,.075,wood,0,1.03+k*.18,-.4,g);for(const a of [-1.0,1.0]){box(.18,.55,.8,concrete?'#b4b6ad':'#374a40',a,.48,0,g);box(.11,1.13,.11,'#425047',a,.81,-.42,g);line([a,.78,.35],[a,1.14,.22],.045,'#344039',g);line([a,1.14,.22],[a,1.14,-.4],.045,'#344039',g);}block(x,z,Math.abs(Math.cos(rot))>.5?2.8:1.0,Math.abs(Math.cos(rot))>.5?1:2.8);benches.push({x:x+Math.sin(rot)*1.6,z:z+Math.cos(rot)*1.6});}
   bench(-12,48.5,0,true);for(const a of [[-23,28,1.57],[22,30,-1.57],[-3,39,3.14],[7,-30,0],[-23,-47,1.57],[23,-53,-1.57],[13,18,0],[-18,-25,0],[-3,-55,0]])bench(...a);
   // Red concrete skate ramps on the west side, visible in captures 647–651.
@@ -130,7 +115,7 @@ window.buildCerroAzul = function (T, scene) {
   const leafGeo=new T.PlaneGeometry(1,1);
   function tree(x,z,h=9,r=4.5){trees.push({x,z,r});block(x,z,.7,.7);const trunkH=h*.52;cyl(.2,.42,trunkH,'#655c46',x,trunkH/2+.2,z);cyl(.3,.43,.95,'#dfded0',x,.65,z);for(let i=0;i<7;i++){const a=i*2.399+randomAngle(),bx=x+Math.cos(a)*r*.6,bz=z+Math.sin(a)*r*.6;line([x,trunkH*.5,z],[bx,h*.8,bz],.1,'#6e654c');}for(let i=0;i<90;i++){const a=rnd()*6.283,rr=Math.sqrt(rnd())*r*.95,xx=x+Math.cos(a)*rr,zz=z+Math.sin(a)*rr,yy=h-1.1+rnd()*2.7-(rr/r)**2*1.9,s=1.35+rnd()*1.15;for(let k=0;k<2;k++){const leaf=mesh(leafGeo,leafMats[i%3],xx,yy,zz);leaf.scale.set(s*1.45,s,1);leaf.rotation.set((rnd()-.5)*2,rnd()*6.28,k*1.57);}}}
   function randomAngle(){return rnd()*.45;}
-  for(const [x,z,h,r] of [[-25,-53,10,4],[-17,-49,9,3.8],[-7,-50,11,4.5],[4,-50,9,3.5],[18,-49,10,4],[25,-43,9,3.5],[-24,-31,10,4],[-13,-27,9,3.5],[2,-29,10,4],[17,-27,9,3.5],[25,-18,10,4],[-24,-7,9,3.5],[-8,-4,10,4],[8,-5,9,3.5],[23,3,9,3.5],[-22,18,9,3.5],[-9,23,10,4],[5,22,9,3.5],[20,27,10,4],[-20,43,9,3.5],[-8,48,10,4],[7,49,9,3.5],[21,52,10,4],[-48,-48,10,4],[-47,-5,8,4],[51,64,9,4],[8,-125,10,5]])tree(x,z,h,r);
+  for(const [x,z,h,r] of [[-23,-60,11,6],[-11,-58,10,5],[0,-59,12,6],[16,-60,12,6],[24,-48,11,5],[-24,-39,10,4.5],[-15,-33,11,5],[-2,-36,9,4],[14,-37,10,4.5],[23,-26,11,5],[-22,-23,10,4],[-7,-17,9,4],[4,-20,10,4],[-22,28,8,4],[19,32,10,4],[-1,16,8,3],[7,26,7,3],[23,15,9,4],[-48,-48,10,4],[-47,-5,8,4],[51,64,9,4],[8,-125,10,5]])tree(x,z,h,r);
   function palm(x,z,h=9){cyl(.16,.28,h,'#887d5b',x,h/2,z);block(x,z,.6,.6);for(let i=0;i<9;i++){const a=i*.7,pts=[new T.Vector3(x,h-.2,z),new T.Vector3(x+Math.cos(a)*2,h+.7,z+Math.sin(a)*2),new T.Vector3(x+Math.cos(a)*3.8,h-1.2,z+Math.sin(a)*3.8)];mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),8,.1,5,false),'#486c3c');for(let k=1;k<6;k++){const t=k/6,cx=x+Math.cos(a)*t*3.5,cz=z+Math.sin(a)*t*3.5,cy=h+Math.sin(t*3.14)*.8-t;for(const side of [-1,1])line([cx,cy,cz],[cx+Math.cos(a+1.2*side)*1.0,cy-.6,cz+Math.sin(a+1.2*side)*1.0],.045,'#5d8147');}}}
   palm(25,39);palm(25,-7);palm(23,-59);palm(-44,-39);
   function lamp(x,z){cyl(.065,.12,5,'#59665e',x,2.7,z);const glow=new T.MeshStandardMaterial({color:'#eee4c3',emissive:'#fbd7a2',emissiveIntensity:.2});lamps.push(glow);ball(x,5.3,z,.3,.43,.3,glow);cyl(.45,.12,.22,'#526156',x,5.7,z);}
