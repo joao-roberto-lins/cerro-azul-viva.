@@ -1,5 +1,4 @@
-/* Rebuilt from the user's jogo.rar: aerial image, street photographs and fountain flythrough.
-   North is -Z. Dimensions are visual estimates, not a cadastral survey. */
+/* Cerro Azul Viva scenery. Street character and facade details are modeled from the user's photographic references in jogo.rar.\n   Mission coordinates and the established fountain/plaza gameplay layout are preserved. North is -Z. */
 window.buildCerroAzul = function (T, scene) {
   'use strict';
   const root = new T.Group(); scene.add(root);
@@ -15,12 +14,12 @@ window.buildCerroAzul = function (T, scene) {
   function block(x,z,w,d){obstacles.push({x,z,w,d});}
   function line(a,b,r,c,p=root){const v=new T.Vector3(...a),q=new T.Vector3(...b),o=cyl(r,r,v.distanceTo(q),c,0,0,0,p,7);o.position.copy(v.add(q).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),q.sub(new T.Vector3(...a)).normalize());return o;}
   function canvasTexture(draw,size=512){const c=document.createElement('canvas');c.width=c.height=size;draw(c.getContext('2d'),size);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;return t;}
-  const paver=canvasTexture((c,n)=>{c.fillStyle='#c4c7c1';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=32)for(let x=-32;x<n;x+=64){const a=x+(y/32%2)*32;const v=186+rnd()*24;c.fillStyle=`rgb(${v},${v+3},${v-2})`;c.fillRect(a+1,y+1,62,30);c.fillStyle='#ffffff20';c.fillRect(a+3,y+3,57,2);}for(let i=0;i<12000;i++){c.fillStyle=rnd()<.5?'#ffffff10':'#0000000c';c.fillRect(rnd()*n,rnd()*n,1.5,1.5);}});
-  const stone=canvasTexture((c,n)=>{c.fillStyle='#777d77';c.fillRect(0,0,n,n);for(let y=-1;y<12;y++)for(let x=-1;x<11;x++){const px=x*55+(y%2)*27.5,py=y*47.6,v=122+rnd()*35;c.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3;c.lineTo(px+30*Math.sin(a),py+30*Math.cos(a));}c.closePath();c.fillStyle=`rgb(${v+6},${v+6},${v})`;c.fill();c.strokeStyle='#6d746d';c.lineWidth=2;c.stroke();}for(let i=0;i<15000;i++){c.fillStyle=rnd()<.5?'#fff1':'#0001';c.fillRect(rnd()*n,rnd()*n,1,1);}});
+  const paver=canvasTexture((c,n)=>{c.fillStyle='#8c928e';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=32)for(let x=-32;x<n;x+=64){const a=x+(y/32%2)*32;const v=160+rnd()*28;c.fillStyle=`rgb(${v},${v+2},${v-3})`;c.fillRect(a+1,y+1,62,30);c.fillStyle='#ffffff20';c.fillRect(a+3,y+3,57,2);}for(let i=0;i<12000;i++){c.fillStyle=rnd()<.5?'#ffffff10':'#0000000c';c.fillRect(rnd()*n,rnd()*n,1.5,1.5);}});
+  const stone=canvasTexture((c,n)=>{c.fillStyle='#555b5b';c.fillRect(0,0,n,n);for(let i=0;i<21000;i++){const v=62+rnd()*42;c.fillStyle=`rgba(${v},${v+2},${v+2},${.035+rnd()*.09})`;const s=.5+rnd()*2.4;c.fillRect(rnd()*n,rnd()*n,s,s);}for(let i=0;i<34;i++){c.strokeStyle=rnd()<.5?'#32373725':'#a9aca912';c.lineWidth=.7+rnd()*1.4;c.beginPath();let x=rnd()*n,y=rnd()*n;c.moveTo(x,y);for(let k=0;k<4;k++){x+=(rnd()-.5)*70;y+=(rnd()-.5)*26;c.lineTo(x,y);}c.stroke();}for(let y=24;y<n;y+=64){c.fillStyle='#ffffff08';c.fillRect(0,y,n,1);}});
   const grass=canvasTexture((c,n)=>{c.fillStyle='#658047';c.fillRect(0,0,n,n);for(let i=0;i<34000;i++){c.fillStyle=['#455f3030','#a1ad5135','#314a3420','#abb87026'][i%4];c.fillRect(rnd()*n,rnd()*n,1+rnd()*3,2+rnd()*5);}});
   const roofTex=canvasTexture((c,n)=>{c.fillStyle='#a46145';c.fillRect(0,0,n,n);for(let y=0;y<n;y+=48)for(let x=0;x<n;x+=22){const v=128+rnd()*36;c.fillStyle=`rgb(${v+35},${v-42},${v-68})`;c.fillRect(x+1,y+2,20,45);c.fillStyle='#f3b18355';c.fillRect(x+4,y+2,4,43);c.fillStyle='#482d2633';c.fillRect(x+17,y+2,3,46);}});
   const paveMat=new T.MeshStandardMaterial({map:paver,roughness:.94});
-  const roadMat=new T.MeshStandardMaterial({map:stone,roughness:.98});
+  const roadMat=new T.MeshStandardMaterial({map:stone,roughness:.96,metalness:.02});
   const grassMat=new T.MeshStandardMaterial({map:grass,roughness:1});
   const tileMat=new T.MeshStandardMaterial({map:roofTex,roughness:.85,side:T.DoubleSide});
   function worldUV(geo,scale=5){const p=geo.attributes.position,uv=[];for(let i=0;i<p.count;i++)uv.push(p.getX(i)/scale,p.getZ(i)/scale);geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));return geo;}
@@ -32,6 +31,10 @@ window.buildCerroAzul = function (T, scene) {
   function roof(w,d,h,x,y,z,p=root){const g=new T.BufferGeometry();const v=[-w/2,0,-d/2,w/2,0,-d/2,0,h,-d/2,-w/2,0,d/2,0,h,d/2,w/2,0,d/2,-w/2,0,-d/2,0,h,-d/2,0,h,d/2,-w/2,0,-d/2,0,h,d/2,-w/2,0,d/2,w/2,0,-d/2,w/2,0,d/2,0,h,d/2,w/2,0,-d/2,0,h,d/2,0,h,-d/2];g.setAttribute('position',new T.Float32BufferAttribute(v,3));g.computeVertexNormals();worldUV(g,4);return mesh(g,tileMat,x,y,z,p);}
   function hipped(w,d,h,x,y,z,p){const g=new T.BufferGeometry(),a=[-w/2,0,-d/2],b=[w/2,0,-d/2],c=[w/2,0,d/2],e=[-w/2,0,d/2],q=[0,h,0];g.setAttribute('position',new T.Float32BufferAttribute([...a,...b,...q,...b,...c,...q,...c,...e,...q,...e,...a,...q],3));g.computeVertexNormals();worldUV(g,4);return mesh(g,tileMat,x,y,z,p);}
   function sign(text,w,h,x,y,z,p=root,bg='#eee9df',fg='#283e4a'){const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,1024,256);ctx.fillStyle=fg;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='600 96px Arial';ctx.fillText(text,512,133,980);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;const s=mesh(new T.PlaneGeometry(w,h),new T.MeshStandardMaterial({map:tex,roughness:.8,side:T.DoubleSide}),x,y,z,p);s.castShadow=false;return s;}
+  function awning(x,z,w,rot=0,c='#e7e0cf'){const g=group(x,z,rot);const a=box(w,.13,1.5,c,0,2.85,.4,g);a.rotation.x=-.16;box(w+.15,.09,.12,'#77786f',0,2.78,-.28,g);return g;}
+  function balcony(x,z,w,rot=0){const g=group(x,z,rot);box(w,.12,1.05,'#c9c9c0',0,4.85,.35,g);for(let xx=-w/2+.2;xx<w/2;xx+=.42)box(.045,.8,.045,'#65706e',xx,5.22,.82,g);box(w,.06,.06,'#65706e',0,5.58,.82,g);return g;}
+  function motorcycle(x,z,rot=0,c='#384d55'){const g=group(x,z,rot);for(const zz of [-.65,.65]){const w=mesh(new T.TorusGeometry(.29,.045,6,18),'#242b2b',0,.47,zz,g);w.rotation.y=Math.PI/2;}line([0,.47,-.65],[0,.84,.08],.04,c,g);line([0,.84,.08],[0,.47,.65],.04,c,g);line([0,.84,.08],[0,1.02,-.22],.04,c,g);box(.32,.12,.4,c,0,.93,.18,g);box(.28,.08,.45,'#303536',0,.95,-.20,g);line([-.27,1.12,-.48],[.27,1.12,-.48],.035,'#555e5b',g);return g;}
+  function parkedTruck(x,z,rot=0,c='#3f78a8'){const g=group(x,z,rot);box(2.25,1.65,3.25,c,0,1.15,1.0,g);box(2.35,2.1,4.4,'#d3d1c5',0,1.35,-2.55,g);box(1.9,.72,.08,'#334956',0,1.55,2.64,g);for(const xx of [-1.05,1.05])for(const zz of [-2.55,1.75]){const w=mesh(new T.TorusGeometry(.39,.12,7,18),'#262c2b',xx,.52,zz,g);w.rotation.y=Math.PI/2;}block(x,z,rot===0?2.5:7.5,rot===0?7.5:2.5);return g;}
   // Terrain and street framework adjusted from the user's 2023 plan.
   // Fountain, plaza landscaping, furniture and buildings are intentionally unchanged.
   plane(950,950,grassMat,0,0,-.13,8);plane(285,330,paveMat,0,0,-.04);
@@ -52,6 +55,13 @@ window.buildCerroAzul = function (T, scene) {
   box(56,.22,133,'#b7b6aa',0,.08,0);plane(55.5,132.5,paveMat,0,0,.198,4);
   for(const x of [-27.5,27.5])box(.45,.05,132,'#a76d59',x,.23,0);
   for(const z of [-66,66])box(55,.05,.45,'#a76d59',0,.23,z);
+  // Photo-based sidewalks and curbs along the commercial frontages.
+  for(const x of [-40.0,40.0])plane(3.1,154,paveMat,x,0,.075,4);
+  for(const z of [-79.8,79.8])plane(128,3.0,paveMat,0,z,.075,4);
+  for(const x of [-38.45,38.45])box(.16,.16,154,'#d6d2c7',x,.13,0);
+  for(const z of [-78.25,78.25])box(128,.16,.16,'#d6d2c7',0,.13,z);
+  // Tree pits and small utility details visible along the square edge.
+  for(const [x,z] of [[-40,-52],[-40,-18],[-40,18],[-40,52],[40,-54],[40,-20],[40,16],[40,50]]){cyl(.66,.66,.08,'#8b8a80',x,.12,z,root,20);cyl(.48,.48,.09,'#5d704c',x,.17,z,root,20);}
   // Watercourses shown on the plan are brought into the playable horizon as simplified blue corridors.
   // They are deliberately kept outside the core walking square and pass beneath the road deck where the survey shows crossings.
   strip([[-150,-118],[-128,-111],[-108,-114],[-88,-108],[-70,-99],[-58,-88]],7.2,'#2f9ed0',.005);
@@ -83,59 +93,27 @@ window.buildCerroAzul = function (T, scene) {
   const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#6ec4d8',metalness:.25,roughness:.24,transparent:true,opacity:.87});
   const water=mesh(basinGeo,waterMat,0,.37,0);water.castShadow=false;pools.push(waterMat);
   for(let i=0;i<7;i++){const x=-22.15+Math.sin(i*.7)*.7,z=43+i*2.55;block(x,z,3.2,2.8);const pts=[];for(let k=0;k<13;k++){const t=k/12;pts.push(new T.Vector3(x+t*1.5,.46+Math.sin(t*Math.PI)*1.2,z));}const jet=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),12,.038,5,false),new T.MeshStandardMaterial({color:'#ccf3fa',transparent:true,opacity:.7,roughness:.18}));jets.push(jet);}
-  // Península gramada no formato visto no vídeo.
-  const innerIsland=[[-13,39],[-8,40],[-5,44],[-2,49],[2,52],[-1,56],[-7,56],[-13,53],[-17,49],[-18,45]];
-  shape(innerIsland,.39,grassMat);
-  edge(innerIsland,.405,'#44506a',.24);
-
-  // Pequeno acesso claro à península.
-  for(let i=0;i<4;i++)box(1.15,.07,1.05,'#e8e7df',-1.2+i*1.05,.43,54.2);
-
-  // Pergolado do vídeo: quatro pilares, cobertura de ripas e balanço suspenso.
-  const pergola=group(-10,47);
-  for(const x of [-2.35,2.35])for(const z of [-2.05,2.05]){box(.26,3.9,.26,'#7b4c2d',x,2.15,z,pergola);block(-10+x,47+z,.30,.30);}
-  for(const x of [-2.45,2.45])box(.30,.34,5.3,'#875433',x,4.08,0,pergola);
-  for(let z=-2.45;z<=2.45;z+=.45)box(5.45,.18,.17,'#9c673d',0,4.30,z,pergola);
-  for(const x of [-1.45,1.45]){line([x,4.15,-.2],[x,1.65,-.2],.022,'#474b48',pergola);line([x,4.15,.35],[x,1.65,.35],.022,'#474b48',pergola);}
-  box(3.55,.16,.95,'#5f4838',0,1.54,.05,pergola);
-  box(3.55,.16,.18,'#6f5140',0,2.05,.50,pergola);
-  for(const x of [-1.45,1.45])line([x,1.54,.46],[x,2.05,.50],.04,'#4d5550',pergola);
-  block(-10,47,4.0,1.4);
-
-  // Letreiro baixo na borda da praça, conforme a animação.
-  const letterCanvas=document.createElement('canvas');letterCanvas.width=2048;letterCanvas.height=256;const lc=letterCanvas.getContext('2d');lc.font='900 181px Arial';lc.textBaseline='middle';lc.lineWidth=10;lc.strokeStyle='#f2f1eb';lc.fillStyle='#202b2d';lc.strokeText('EU',8,130);lc.fillText('EU',8,130);lc.fillStyle='#d53d47';lc.strokeText('♥',315,130);lc.fillText('♥',315,130);lc.fillStyle='#202b2d';lc.strokeText('CERRO AZUL',530,130,1500);lc.fillText('CERRO AZUL',530,130,1500);
-  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;
-  mesh(new T.PlaneGeometry(17.7,2.05),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.25,side:T.DoubleSide,roughness:.6}),-15,1.52,63.0);
-  box(18.8,.45,1.15,'#c9c9c3',-15,.42,63.0);block(-15,63.0,18.8,1.2);
-
-  // Banco circular/árvore central visível no lado oposto do espelho d'água.
-  const roundPlanter=group(7,31);
-  cyl(3.45,3.45,.34,'#c9c7be',0,.31,0,roundPlanter,32);
-  cyl(2.95,2.95,.39,'#718f52',0,.39,0,roundPlanter,32);
-  block(7,31,5.9,5.9);
-
+  block(-18,59.8,8,3);block(-16.8,40.1,7,3.5);
+  const innerIsland=[[-17,45],[-15,42],[-9,44],[-7,50],[-4,58],[-8,60],[-15,57],[-17,52]];lawn(innerIsland);
+  const pergola=group(-12,49);
+  for(const x of [-2.2,2.2])for(const z of [-2.3,2.3]){box(.25,3.9,.25,'#62422e',x,2.15,z,pergola);block(-12+x,49+z,.28,.28);}
+  for(const x of [-2.25,2.25])box(.23,.35,5.7,'#795138',x,4.0,0,pergola);
+  for(let z=-2.65;z<=2.7;z+=.49)box(5.35,.22,.16,'#98663e',0,4.2,z,pergola);
+  for(let x=-10;x<-5;x+=1.4)box(1.18,.1,1.2,'#e4e0d4',x,.35,50);
+  // Raised, transparent lettering, matching the blue letters in the street photographs.
+  const letterCanvas=document.createElement('canvas');letterCanvas.width=2048;letterCanvas.height=256;const lc=letterCanvas.getContext('2d');lc.font='900 181px Arial';lc.textBaseline='middle';lc.lineWidth=10;lc.strokeStyle='#fff';lc.fillStyle='#1678aa';lc.strokeText('EU',8,130);lc.fillText('EU',8,130);lc.fillStyle='#dc3b48';lc.strokeText('♥',315,130);lc.fillText('♥',315,130);lc.fillStyle='#1678aa';lc.strokeText('CERRO AZUL',530,130,1500);lc.fillText('CERRO AZUL',530,130,1500);
+  const letters=new T.CanvasTexture(letterCanvas);letters.colorSpace=T.SRGBColorSpace;mesh(new T.PlaneGeometry(17.4,2.1),new T.MeshStandardMaterial({map:letters,transparent:true,alphaTest:.3,side:T.DoubleSide,roughness:.58}),-12,1.53,63.2);box(18,.35,.95,'#eee9dc',-12,.4,63.2);block(-12,63.2,18,1);
   function bench(x,z,rot=0,concrete=false){const g=group(x,z,rot);const wood=concrete?'#d4d4c9':'#6d4d35';for(let k=0;k<4;k++)box(2.7,.075,.16,wood,0,.77,-.3+k*.2,g);for(let k=0;k<3;k++)box(2.7,.14,.075,wood,0,1.03+k*.18,-.4,g);for(const a of [-1.0,1.0]){box(.18,.55,.8,concrete?'#b4b6ad':'#374a40',a,.48,0,g);box(.11,1.13,.11,'#425047',a,.81,-.42,g);line([a,.78,.35],[a,1.14,.22],.045,'#344039',g);line([a,1.14,.22],[a,1.14,-.4],.045,'#344039',g);}block(x,z,Math.abs(Math.cos(rot))>.5?2.8:1.0,Math.abs(Math.cos(rot))>.5?1:2.8);benches.push({x:x+Math.sin(rot)*1.6,z:z+Math.cos(rot)*1.6});}
-  bench(-23,47,Math.PI/2,true);bench(22,46,-Math.PI/2,true);bench(-22,18,Math.PI/2,true);
-
-  // Quiosque verde simples do vídeo: paredes verdes, grandes vãos escuros e cobertura baixa terracota.
-  const kiosk=group(17,34);
-  box(8.6,3.5,6.4,'#28a339',0,1.95,0,kiosk);
-  box(9.4,.28,7.2,'#e4d8c3',0,3.78,0,kiosk);
-  box(8.8,.38,6.6,'#b85d3d',0,4.05,0,kiosk);
-  box(3.6,1.45,.08,'#202b2b',0,2.2,3.22,kiosk);
-  box(3.1,1.45,.08,'#202b2b',-4.31,2.2,0,kiosk);
-  box(1.35,2.35,.08,'#243030',2.8,1.55,3.23,kiosk);
-  block(17,34,8.8,6.6);buildings.push({x:17,z:34,w:8.8,d:6.6,color:'#28a339'});
-
-  // Relógio e painel existentes são preservados; nenhum telhado de edificações externas é alterado.
-  const clock=group(2,58);box(.4,5.7,.4,'#b86a3d',0,3.0,0,clock);box(1.8,2.5,.4,'#e88535',0,5.8,0,clock);sign('23°',1.5,.8,0,5.9,.23,clock,'#182c28','#b4df99');sign('CERRO AZUL',1.5,.35,0,6.7,.23,clock,'#36895d','#fff');block(2,58,.5,.5);
-  const billboard=group(-26,62);box(.3,5.3,.3,'#454846',0,2.9,0,billboard);box(4.7,2.4,.18,'#252e33',0,5.5,0,billboard);sign('VIVA A PRAÇA',4.3,.5,0,5.5,.1,billboard,'#252e33','#e7e9e4');
-  const northKiosk=group(-18,-52);box(6,2.9,5,'#d8cfb1',0,1.7,0,northKiosk);const kr=hipped(7,6,1.25,0,3.2,0,northKiosk);kr.material=mat('#57704d');box(3,.95,.08,'#3a5251',0,2.2,2.54,northKiosk);block(-18,-52,6,5);
-
+  bench(-12,48.5,0,true);for(const a of [[-23,28,1.57],[22,30,-1.57],[-3,39,3.14],[7,-30,0],[-23,-47,1.57],[23,-53,-1.57],[13,18,0],[-18,-25,0],[-3,-55,0]])bench(...a);
   // Red concrete skate ramps on the west side, visible in captures 647–651.
   plane(15,24,roadMat,-16,0,.23,4);edge([[-24,-12],[-8,-12],[-8,12],[-24,12]],.26,'#ba564b',.15);
   function ramp(x,z,rot){const g=group(x,z,rot),s=new T.Shape();s.moveTo(-2.2,0);s.lineTo(2.2,0);s.lineTo(2.2,1.65);s.bezierCurveTo(1.6,1.65,.7,.15,-2.2,.15);s.closePath();const geo=new T.ExtrudeGeometry(s,{depth:5.5,bevelEnabled:false,curveSegments:20});const o=mesh(geo,'#b6514c',0,.22,-2.75,g);o.rotation.y=Math.PI/2;block(x,z,6,4.5);}
   ramp(-16,-8,0);ramp(-16,8,Math.PI);box(1.6,.45,6,'#b95b50',-16,.45,0);block(-16,0,1.6,6);line([-11,.95,-4],[-11,.95,4],.06,'#767d7a');for(const z of [-3.5,3.5])line([-11,.25,z],[-11,.95,z],.06,'#767d7a');
+  // Small municipal building near the southern entry.
+  const kiosk=group(19,53);box(9,3.8,7,'#dad7c2',0,2.1,0,kiosk);box(9.4,.35,7.4,'#9d9e91',0,4.1,0,kiosk);box(9,.7,7.02,'#858d84',0,.55,0,kiosk);box(4,1.3,.05,'#284b51',0,2.4,3.52,kiosk);for(const x of [-2,0,2])box(.1,1.45,.1,'#eef1e4',x,2.4,3.56,kiosk);box(1.4,2.5,.06,'#a6aca3',-3.1,1.55,3.55,kiosk);sign('FISCALIZAÇÃO MUNICIPAL',8,.65,0,3.55,3.54,kiosk);block(19,53,9,7);buildings.push({x:19,z:53,w:9,d:7,color:'#d4cfb4'});
+  const clock=group(2,58);box(.4,5.7,.4,'#b86a3d',0,3.0,0,clock);box(1.8,2.5,.4,'#e88535',0,5.8,0,clock);sign('23°',1.5,.8,0,5.9,.23,clock,'#182c28','#b4df99');sign('CERRO AZUL',1.5,.35,0,6.7,.23,clock,'#36895d','#fff');block(2,58,.5,.5);
+  const billboard=group(-26,62);box(.3,5.3,.3,'#454846',0,2.9,0,billboard);box(4.7,2.4,.18,'#252e33',0,5.5,0,billboard);sign('VIVA A PRAÇA',4.3,.5,0,5.5,.1,billboard,'#252e33','#e7e9e4');
+  const northKiosk=group(-18,-52);box(6,2.9,5,'#d8cfb1',0,1.7,0,northKiosk);const kr=hipped(7,6,1.25,0,3.2,0,northKiosk);kr.material=mat('#57704d');box(3,.95,.08,'#3a5251',0,2.2,2.54,northKiosk);block(-18,-52,6,5);
   // Pavilion-style playground, scaled from the aerial layout.
   const play=group(17,-2);box(10,.05,14,'#b89b65',0,.24,0,play);
   for(const x of [-2,2])for(const z of [-2,2])cyl(.11,.11,3.1,'#d56f37',x,1.8,z,play);
@@ -152,6 +130,7 @@ window.buildCerroAzul = function (T, scene) {
   palm(25,39);palm(25,-7);palm(23,-59);palm(-44,-39);
   function lamp(x,z){cyl(.065,.12,5,'#59665e',x,2.7,z);const glow=new T.MeshStandardMaterial({color:'#eee4c3',emissive:'#fbd7a2',emissiveIntensity:.2});lamps.push(glow);ball(x,5.3,z,.3,.43,.3,glow);cyl(.45,.12,.22,'#526156',x,5.7,z);}
   for(const [x,z] of [[-26,-60],[26,-60],[-26,61],[26,61],[-6,34],[6,-12],[-5,-41],[24,9],[-26,15]])lamp(x,z);
+  for(const [x,z] of [[-40,-58],[-40,-28],[-40,2],[-40,32],[-40,58],[40,-58],[40,-28],[40,2],[40,32],[40,58]])lamp(x,z);
   for(const [x,z] of [[-25,35],[24,45],[-23,-15],[25,-41],[-8,32]]){cyl(.35,.35,.85,'#526353',x,.68,z);cyl(.38,.38,.1,'#354b41',x,1.14,z);}
   // The bus shelter on Avenida Getúlio Vargas.
   const stop=group(26,21);for(const z of [-3,3])box(.13,2.8,.13,'#36494e',0,1.65,z,stop);box(2.6,.13,7.3,'#526264',-.7,3.05,0,stop);box(.06,1.8,6.7,'#758e89',.1,1.9,0,stop);bench(24.4,21,-Math.PI/2);
@@ -189,6 +168,28 @@ window.buildCerroAzul = function (T, scene) {
   facade(-22,91,27,22,4.8,'#65906d',Math.PI,'heritage');
   facade(7,92,27,23,7.6,'#e1d8bb',Math.PI,'ordinary','SABORES DO RIBEIRA');
   facade(34,93,23,24,7.8,'#d8cbb1',Math.PI,'ordinary');
+  // Awnings and balconies based on the commercial streets shown in Capturas 662–680.
+  awning(-40.6,52,8.2,-Math.PI/2,'#e6e1d4');
+  awning(-40.5,31,9.0,-Math.PI/2,'#ead7b6');
+  balcony(-40.35,-57,8.6,-Math.PI/2);
+  awning(40.45,-64,8.0,Math.PI/2,'#f2e8d2');
+  awning(40.45,-44,9.0,Math.PI/2,'#c78363');
+  balcony(40.35,-44,8.4,Math.PI/2);
+  awning(40.45,-23,9.2,Math.PI/2,'#eee5ce');
+  awning(40.45,3,13.0,Math.PI/2,'#eee8d8');
+  balcony(40.3,3,12.2,Math.PI/2);
+  awning(40.45,34,10.5,Math.PI/2,'#e0d6c3');
+  awning(40.45,60,9.5,Math.PI/2,'#e8dfca');
+  awning(-22,80.55,11.0,Math.PI,'#e5ddc9');
+  awning(7,80.45,12.0,Math.PI,'#efe8d3');
+  awning(34,80.3,10.0,Math.PI,'#e0d8c6');
+
+  // Dense parked motorcycles are a strong visual cue in the east-side photographs.
+  for(const [z,r,c] of [[-48,.10,'#2f4249'],[-43,-.08,'#762f32'],[-37,.07,'#36393a'],[-31,-.12,'#315d78'],[-13,.06,'#4c4c46'],[-7,-.08,'#6a3030'],[10,.12,'#2d4f55'],[16,-.08,'#3d3935'],[23,.07,'#72423a']])motorcycle(40.55,z,Math.PI/2+r,c);
+  motorcycle(-40.5,20,-Math.PI/2,'#45646f');motorcycle(-40.5,26,-Math.PI/2,'#7a3c35');
+
+  // A parked delivery truck echoes the vehicles visible at the outer commercial approaches.
+  parkedTruck(92,-19,0,'#3b75a6');
   // Church faces south across Praça Monsenhor Celso. No church is placed on the western block.
   const church=group(-3,-103),cc='#acafaa',trim='#eeeee1';
   box(32,.25,44,'#c9c8bc',0,.13,0,church);box(21,9.5,29,cc,0,5,-1,church);roof(22,30,4,0,9.6,-1,church);
