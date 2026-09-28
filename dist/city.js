@@ -24,7 +24,8 @@ window.buildCerroAzul = function (T, scene) {
   const grassMat=new T.MeshStandardMaterial({map:grass,roughness:1});
   const tileMat=new T.MeshStandardMaterial({map:roofTex,roughness:.85,side:T.DoubleSide});
   function worldUV(geo,scale=5){const p=geo.attributes.position,uv=[];for(let i=0;i<p.count;i++)uv.push(p.getX(i)/scale,p.getZ(i)/scale);geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));return geo;}
-  function plane(w,d,m,x,z,y=.03,scale=5){const g=new T.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);worldUV(g,scale);const o=mesh(g,m,x,y,z);o.castShadow=false;return o;}\n  function strip(points,width,m,y=.025){for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),s=plane(width,len,m,(a[0]+b[0])/2,(a[1]+b[1])/2,y,3);s.rotation.y=Math.atan2(dx,dz);}waterways.push(points);}
+  function plane(w,d,m,x,z,y=.03,scale=5){const g=new T.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);worldUV(g,scale);const o=mesh(g,m,x,y,z);o.castShadow=false;return o;}
+  function strip(points,width,m,y=.025){for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),s=plane(width,len,m,(a[0]+b[0])/2,(a[1]+b[1])/2,y,3);s.rotation.y=Math.atan2(dx,dz);}waterways.push(points);}
   function shape(points,y,m){const s=new T.Shape();points.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new T.ShapeGeometry(s);g.rotateX(-Math.PI/2);worldUV(g);const o=mesh(g,m,0,y,0);o.castShadow=false;return o;}
   function edge(points,y,c,r=.15,closed=true){for(let i=0;i<points.length-(closed?0:1);i++){const a=points[i],b=points[(i+1)%points.length];line([a[0],y,a[1]],[b[0],y,b[1]],r,c);}}
   function lawn(points){shape(points,.29,grassMat);edge(points,.3,'#d0cbc0',.12);}
