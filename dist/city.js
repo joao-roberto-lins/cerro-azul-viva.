@@ -73,30 +73,16 @@ window.buildCerroAzul = function (T, scene) {
   // Narrower, irregular grass islands leave broader stone paths like the supplied views.
   lawns.forEach((island,k)=>{const cx=island.reduce((n,p)=>n+p[0],0)/island.length,cz=island.reduce((n,p)=>n+p[1],0)/island.length;lawns[k]=island.map(([x,z],i)=>[cx+(x-cx)*(.69+(i%3)*.025),cz+(z-cz)*(.72+(i%2)*.035)]);lawn(lawns[k]);});
   for(const [x,z] of [[-4,-42],[20,-38],[-19,-24],[13,33],[18,20],[-15,27]]){const bed=[[x-2,z-1],[x+1.7,z-1.5],[x+2,z+.6],[x-1,z+1.4]];lawn(bed);for(let i=0;i<10;i++){const xx=x+(rnd()-.5)*3,zz=z+(rnd()-.5)*2;ball(xx,.51,zz,.11,.16,.11,['#eabf55','#e6a6ac','#eee5c6'][i%3]);}}
-  // Elementos centrais reconstruídos diretamente de Animação2.mp4.
-  // O espelho d'água é uma lâmina ornamental sem jatos; a área verde é uma península,
-  // ligada ao piso da praça por um pequeno acesso claro.
-  const fountainShape=new T.Shape();
-  fountainShape.moveTo(-10,-38);
-  fountainShape.lineTo(-22,-38);
-  fountainShape.bezierCurveTo(-27,-39,-29,-43,-29,-49);
-  fountainShape.bezierCurveTo(-29,-56,-26,-60,-21,-61);
-  fountainShape.lineTo(-5,-61);
-  fountainShape.lineTo(-3,-56);
-  fountainShape.lineTo(-8,-52);
-  fountainShape.bezierCurveTo(-12,-49,-16,-49,-18,-46);
-  fountainShape.bezierCurveTo(-20,-43,-17,-39,-10,-38);
-  fountainShape.closePath();
-
-  const basinPoints=fountainShape.getPoints(64).map(v=>[v.x,-v.y]);
-  const basinGeo=new T.ShapeGeometry(fountainShape,80);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
-  const basin=mesh(basinGeo,'#445156',0,.28,0);basin.castShadow=false;
-  edge(basinPoints,.35,'#4b4f50',.34);
-
-  const waterTexture=canvasTexture((c,n)=>{c.fillStyle='#52b9dc';c.fillRect(0,0,n,n);c.strokeStyle='#eafcff55';c.lineWidth=1.4;for(let i=0;i<48;i++){c.beginPath();const x=rnd()*n,y=rnd()*n;c.ellipse(x,y,8+rnd()*38,3+rnd()*16,rnd()*6,0,Math.PI*2);c.stroke();}});
-  const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#58c0e3',metalness:.12,roughness:.20,transparent:true,opacity:.92});
+  // The fountain follows the curved footprint in Animação2.mp4, viewed from its south end.
+  const fountainShape=new T.Shape();fountainShape.moveTo(-24,-61);fountainShape.lineTo(-9,-61);fountainShape.bezierCurveTo(-13,-58,-19,-57,-19,-51);fountainShape.bezierCurveTo(-19,-45,-11,-42,-14,-38);fountainShape.bezierCurveTo(-17,-35,-23,-39,-24,-44);fountainShape.lineTo(-24,-61);
+  const basinPoints=fountainShape.getPoints(40).map(v=>[v.x,-v.y]);
+  const basinGeo=new T.ShapeGeometry(fountainShape,48);basinGeo.rotateX(-Math.PI/2);worldUV(basinGeo,2);
+  const basin=mesh(basinGeo,'#258ab9',0,.30,0);basin.castShadow=false;
+  edge(basinPoints,.38,'#aeaaa0',.25);
+  const waterTexture=canvasTexture((c,n)=>{c.fillStyle='#63c1d4';c.fillRect(0,0,n,n);c.strokeStyle='#d8fdff70';c.lineWidth=1.5;for(let i=0;i<40;i++){c.beginPath();const x=rnd()*n,y=rnd()*n;c.ellipse(x,y,8+rnd()*34,4+rnd()*17,rnd()*6,0,Math.PI*2);c.stroke();}});
+  const waterMat=new T.MeshStandardMaterial({map:waterTexture,color:'#6ec4d8',metalness:.25,roughness:.24,transparent:true,opacity:.87});
   const water=mesh(basinGeo,waterMat,0,.37,0);water.castShadow=false;pools.push(waterMat);
-
+  for(let i=0;i<7;i++){const x=-22.15+Math.sin(i*.7)*.7,z=43+i*2.55;block(x,z,3.2,2.8);const pts=[];for(let k=0;k<13;k++){const t=k/12;pts.push(new T.Vector3(x+t*1.5,.46+Math.sin(t*Math.PI)*1.2,z));}const jet=mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),12,.038,5,false),new T.MeshStandardMaterial({color:'#ccf3fa',transparent:true,opacity:.7,roughness:.18}));jets.push(jet);}
   // Península gramada no formato visto no vídeo.
   const innerIsland=[[-13,39],[-8,40],[-5,44],[-2,49],[2,52],[-1,56],[-7,56],[-13,53],[-17,49],[-18,45]];
   shape(innerIsland,.39,grassMat);
