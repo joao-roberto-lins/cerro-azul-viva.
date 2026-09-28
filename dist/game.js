@@ -37,13 +37,13 @@
       $('name').value=state.name;selectedColor=state.color;$('start').innerHTML='Continuar meu passeio <span>→</span>';
     }
   }catch(e){/* Storage may be unavailable when opening a local file. */}
-  const scene = new T.Scene(); scene.background = new T.Color('#99c5df'); scene.fog = new T.Fog('#99c5df',160,560);
+  const scene = new T.Scene(); scene.background = new T.Color('#a8d2e7'); scene.fog = new T.Fog('#a8d2e7',185,610);
   const camera = new T.PerspectiveCamera(53,innerWidth/innerHeight,0.2,850);
   let renderer;
   try { renderer = new T.WebGLRenderer({canvas:$('world'),antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}); }
   catch(e){$('loading-message').textContent='Este navegador não conseguiu iniciar o 3D. Abra o jogo no Chrome ou Edge com aceleração gráfica ativada.';return;}
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
-  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.10;
   const hemi=new T.HemisphereLight('#c9e2f3','#576c42',1.45);scene.add(hemi);
   const sun=new T.DirectionalLight('#fff0d0',3.1);sun.position.set(-68,110,65);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-112,right:112,top:130,bottom:-115,near:1,far:330});sun.shadow.bias=-0.0006;sun.shadow.normalBias=.12;scene.add(sun);
@@ -97,13 +97,13 @@
   const clara=npc('clara','Clara','PADARIA · ENCOMENDAS',-39,31,'#bb6e51');
   const miguel=npc('miguel','Miguel','MORADOR · HISTÓRIAS DA PRAÇA',-3,-79,'#5c879c');
   label('Feira de ponkan',27,5,-83);label('Praça Monsenhor Celso',2,6,-25);
-  for(let i=0;i<12;i++){const p=person(colorPick(['#708d9a','#bc8a64','#9da56b','#a1768c','#c4ad76']),'#bf946e',i%4===0);scene.add(p.g);walkers.push({...p,t:i/12*2*Math.PI,speed:.035+random()*.027});}
+  for(let i=0;i<18;i++){const p=person(colorPick(['#708d9a','#bc8a64','#9da56b','#a1768c','#c4ad76']),'#bf946e',i%4===0);scene.add(p.g);walkers.push({...p,t:i/18*2*Math.PI,speed:.032+random()*.030});}
   for(const [x,z,id] of [[-25,18,0],[23,42,1],[4,-48,2]]){const g=group(x,z);const trash=box(.65,.25,.55,id%2?'#dbb35c':'#e8e3cd',0,.43,0,g);trash.rotation.y=.7;trash.rotation.z=.2;g.visible=!state.trash.includes(id);interactables.push({id:'trash'+id,trashId:id,type:'trash',name:'Recolher embalagem',x,z,radius:3.1,g});}
   function car(color){const g=new T.Group();const paint=new T.MeshStandardMaterial({color,roughness:.32,metalness:.3});
     box(1.75,.55,3.9,paint,0,.70,0,g);box(1.64,.42,2.05,'#344f5f',0,1.17,-.22,g);box(1.65,.14,1.9,paint,0,1.42,-.26,g);box(1.69,.12,1.08,paint,0,.99,1.35,g);box(1.5,.13,.12,'#3e4544',0,.48,2,g);box(1.5,.13,.12,'#3e4544',0,.48,-2,g);
     for(const x of [-.85,.85])for(const z of [-1.28,1.27]){const w=cylinder(.32,.32,.20,'#27302e',x,.37,z,g,16);w.rotation.z=Math.PI/2;const hub=cylinder(.18,.18,.215,'#c7ccc6',x,.37,z,g,10);hub.rotation.z=Math.PI/2;}
     for(const x of [-.57,.57]){box(.4,.2,.06,'#e7ebdc',x,.77,1.98,g);box(.4,.17,.06,'#a94338',x,.76,-1.98,g);box(.05,.45,.1,paint,x,1.15,.62,g);}box(.37,.14,.05,'#e4e8e4',0,.56,2.06,g);scene.add(g);return g;}
-  for(let i=0;i<5;i++)cars.push({g:car(['#d8dcd7','#9b534a','#547b8b','#bdb8a8','#547765'][i]),t:i/5*424,speed:5.2+i*.35});
+  for(let i=0;i<7;i++)cars.push({g:car(['#d8dcd7','#9b534a','#547b8b','#bdb8a8','#547765','#c7c2b5','#426b83'][i]),t:i/7*424,speed:4.9+i*.28});
   for(const [x,z,r,c] of [[-29,36,0,'#ddd9cc'],[-29,-25,0,'#697e8b'],[-29,-49,0,'#c9ccbe'],[29,41,3.14,'#455668'],[29,-19,3.14,'#c3bca5'],[29,-37,3.14,'#dbdacf'],[-39,56,0,'#71807b'],[39,58,3.14,'#977169'],[10,-78,1.57,'#b9c1b5']]){const g=car(c);g.position.set(x,0,z);g.rotation.y=r;block(x,z,Math.abs(r-1.57)<.1?4:1.8,Math.abs(r-1.57)<.1?1.8:4);}
   const marker=new T.Group();scene.add(marker);const markerRing=mesh(new T.TorusGeometry(1.25,.065,6,36),'#f8c664',0,.4,0,marker);markerRing.rotation.x=Math.PI/2;const markerArrow=mesh(new T.ConeGeometry(.35,.7,4),'#ffd178',0,5,0,marker);markerArrow.rotation.z=Math.PI;
   const goalLabel=label('Ana · conversar',-12,5.3,10,true);
@@ -217,7 +217,7 @@
   function updateNPCs(dt){for(const w of walkers){w.t+=w.speed*dt;const t=(w.t/(Math.PI*2)*360)%360;let x,z;if(t<128){x=-26;z=65-t;w.g.rotation.y=Math.PI;}else if(t<180){x=-26+t-128;z=-63;w.g.rotation.y=Math.PI/2;}else if(t<308){x=26;z=-63+t-180;w.g.rotation.y=0;}else{x=26-(t-308);z=65;w.g.rotation.y=-Math.PI/2;}w.g.position.set(x,.31,z);animatePerson(w,true,elapsed*.75);}
     updateTraffic(dt);
   }
-  const dayColor=new T.Color('#99c5df'),nightColor=new T.Color('#324c69');
+  const dayColor=new T.Color('#a8d2e7'),nightColor=new T.Color('#324c69');
   function updateDay(dt){state.time+=dt*.65;if(state.time>=1440){state.time-=1440;state.day++;if(state.step<20||state.step>=24){const seasons=['primavera','verao','outono','inverno'];state.season=seasons[(seasons.indexOf(state.season)+1)%4];}}const day=clamp(Math.sin((state.time-360)/720*Math.PI)*1.8+.15,0,1);scene.background.copy(nightColor).lerp(dayColor,day);scene.fog.color.copy(scene.background);sun.intensity=(.2+day*2.9)*(state.raining?.68:1);hemi.intensity=.65+day*.9;lamps.forEach(m=>m.emissiveIntensity=.2+(1-day)*2.5);}
   function toggleRain(){state.rainManual=!(state.rainManual??(Math.floor(state.time/35)%3===0));state.raining=state.rainManual;city.setSeason(state.season,state.raining&&!state.inTunnel,player.g.position);save();updateHUD();toast(state.raining?'Chuva na praça. As pedras escureceram.':'A chuva parou.');}
   $('weather').onclick=()=>{if(!paused())toggleRain();};
