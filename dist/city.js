@@ -150,11 +150,6 @@ window.buildCerroAzul = function (T, scene) {
   plane(15,24,roadMat,-16,0,.23,4);edge([[-24,-12],[-8,-12],[-8,12],[-24,12]],.26,'#ba564b',.15);
   function ramp(x,z,rot){const g=group(x,z,rot),s=new T.Shape();s.moveTo(-2.2,0);s.lineTo(2.2,0);s.lineTo(2.2,1.65);s.bezierCurveTo(1.6,1.65,.7,.15,-2.2,.15);s.closePath();const geo=new T.ExtrudeGeometry(s,{depth:5.5,bevelEnabled:false,curveSegments:20});const o=mesh(geo,'#b6514c',0,.22,-2.75,g);o.rotation.y=Math.PI/2;block(x,z,6,4.5);}
   ramp(-16,-8,0);ramp(-16,8,Math.PI);box(1.6,.45,6,'#b95b50',-16,.45,0);block(-16,0,1.6,6);line([-11,.95,-4],[-11,.95,4],.06,'#767d7a');for(const z of [-3.5,3.5])line([-11,.25,z],[-11,.95,z],.06,'#767d7a');
-  // Small municipal building near the southern entry.
-  const kiosk=group(19,53);box(9,3.8,7,'#dad7c2',0,2.1,0,kiosk);box(9.4,.35,7.4,'#9d9e91',0,4.1,0,kiosk);box(9,.7,7.02,'#858d84',0,.55,0,kiosk);box(4,1.3,.05,'#284b51',0,2.4,3.52,kiosk);for(const x of [-2,0,2])box(.1,1.45,.1,'#eef1e4',x,2.4,3.56,kiosk);box(1.4,2.5,.06,'#a6aca3',-3.1,1.55,3.55,kiosk);sign('FISCALIZAÇÃO MUNICIPAL',8,.65,0,3.55,3.54,kiosk);block(19,53,9,7);buildings.push({x:19,z:53,w:9,d:7,color:'#d4cfb4'});
-  const clock=group(2,58);box(.4,5.7,.4,'#b86a3d',0,3.0,0,clock);box(1.8,2.5,.4,'#e88535',0,5.8,0,clock);sign('23°',1.5,.8,0,5.9,.23,clock,'#182c28','#b4df99');sign('CERRO AZUL',1.5,.35,0,6.7,.23,clock,'#36895d','#fff');block(2,58,.5,.5);
-  const billboard=group(-26,62);box(.3,5.3,.3,'#454846',0,2.9,0,billboard);box(4.7,2.4,.18,'#252e33',0,5.5,0,billboard);sign('VIVA A PRAÇA',4.3,.5,0,5.5,.1,billboard,'#252e33','#e7e9e4');
-  const northKiosk=group(-18,-52);box(6,2.9,5,'#d8cfb1',0,1.7,0,northKiosk);const kr=hipped(7,6,1.25,0,3.2,0,northKiosk);kr.material=mat('#57704d');box(3,.95,.08,'#3a5251',0,2.2,2.54,northKiosk);block(-18,-52,6,5);
   // Pavilion-style playground, scaled from the aerial layout.
   const play=group(17,-2);box(10,.05,14,'#b89b65',0,.24,0,play);
   for(const x of [-2,2])for(const z of [-2,2])cyl(.11,.11,3.1,'#d56f37',x,1.8,z,play);
