@@ -25,3 +25,263 @@ dialog{border:1px solid #ffffff25;border-radius:14px;background:#132b35f7;color:
 @media(max-width:400px){.mission-panel,#job-panel{width:calc(100vw - 185px)}.mission-panel{padding:12px}.mission-panel h2{font-size:17px}.mission-top .eyebrow{font-size:11px}.mission-panel p{font-size:14px}#job-panel{top:355px}.topbar .brand h1{font-size:20px}}
 .landmark.conversation{background:#f6eedde8;border:1px solid #f8c67d;color:#213940;font-size:12px;max-width:150px;white-space:normal;text-align:center;line-height:1.3;box-shadow:0 3px 10px #182c3640}
 @media(max-width:400px){.topbar .brand .eyebrow{display:none}.topbar .brand h1{font-size:18px}.topbar .clock{padding:6px}.topbar .clock>span{display:none}.topbar .icon-button{width:27px;height:30px}.topbar{left:10px;right:10px}}
+
+
+/* Mobile gameplay declutter v1 */
+@media (max-width: 580px) and (pointer: coarse) {
+  /* Keep the 3D world visible: mobile HUD becomes compact and edge-aligned. */
+  .vignette { box-shadow: inset 0 0 65px 18px #0b22331c; }
+
+  .topbar {
+    top: max(8px, env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    min-height: 38px;
+    align-items: flex-start;
+  }
+  .brand { gap: 0; }
+  .brand-mark,
+  .brand .eyebrow { display: none !important; }
+  .topbar .brand h1 {
+    font-size: 18px;
+    line-height: 34px;
+    white-space: nowrap;
+    text-shadow: 0 1px 5px #1027318f;
+  }
+  .top-actions { gap: 4px; }
+  .clock {
+    min-height: 34px;
+    padding: 5px 7px;
+    gap: 3px;
+    border-radius: 7px;
+  }
+  .clock > span,
+  .clock small { display: none !important; }
+  .clock b { font-size: 13px; }
+  .icon-button {
+    width: 32px;
+    height: 34px;
+    min-width: 32px;
+    padding: 0;
+    font-size: 15px;
+    border-radius: 7px;
+  }
+
+  .place-label { display: none !important; }
+
+  #vitals {
+    top: calc(max(8px, env(safe-area-inset-top)) + 45px);
+    left: 10px;
+    width: 116px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    background: #132b34df;
+    backdrop-filter: blur(10px);
+  }
+  #vitals > div:not(.stat-track) {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  #vitals .stat-track {
+    height: 4px;
+    margin: 4px 0 6px;
+  }
+  #recovery { display: none !important; }
+
+  .mission-panel {
+    top: calc(max(8px, env(safe-area-inset-top)) + 45px);
+    left: 136px;
+    right: 10px;
+    width: auto;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: #132b34e8;
+    backdrop-filter: blur(10px);
+  }
+  .mission-top .eyebrow {
+    font-size: 9px;
+    letter-spacing: .2px;
+  }
+  .mission-top > span:last-child { display: none; }
+  .mission-panel h2 {
+    font-size: 14px;
+    line-height: 1.15;
+    margin: 6px 0 4px;
+  }
+  .mission-panel p {
+    font-size: 10px;
+    line-height: 1.3;
+    min-height: 0;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .mission-bottom {
+    font-size: 10px;
+    margin-top: 5px;
+  }
+  #mission-reward { display: none; }
+  .mission-progress {
+    height: 2px;
+    margin-top: 6px;
+  }
+
+  #job-panel {
+    top: 150px;
+    right: 10px;
+    width: min(190px, calc(100vw - 145px));
+    padding: 9px;
+    border-radius: 8px;
+  }
+  #job-panel .eyebrow { font-size: 9px; }
+  #job-panel > b { font-size: 12px; }
+  #job-panel p { font-size: 10px; line-height: 1.3; }
+
+  .map-panel {
+    left: 10px;
+    bottom: 178px;
+    width: 98px;
+    padding: 4px;
+    border-radius: 7px;
+    opacity: .9;
+  }
+  .map-title,
+  .map-legend { display: none !important; }
+  #minimap { border-radius: 4px; }
+  .map-panel.expanded {
+    left: 10px;
+    right: 10px;
+    bottom: 178px;
+    width: auto;
+    padding: 8px;
+  }
+  .map-panel.expanded .map-title,
+  .map-panel.expanded .map-legend { display: flex !important; }
+
+  .player-panel {
+    left: 10px;
+    right: 10px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    min-width: 0;
+    min-height: 58px;
+    padding: 7px 9px;
+    gap: 8px;
+    border-radius: 8px;
+  }
+  .avatar-icon {
+    width: 32px;
+    height: 36px;
+    font-size: 17px;
+  }
+  .player-info > b { font-size: 13px; }
+  .player-info > small,
+  .wallet > small { font-size: 9px; }
+  .energy {
+    width: 82px;
+    margin-top: 4px;
+  }
+  .wallet > b {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .touch-controls {
+    left: 10px;
+    right: 10px;
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 67px);
+    align-items: flex-end;
+  }
+  .dpad {
+    grid-template-columns: 47px 47px 47px;
+    grid-template-rows: 47px 47px;
+    gap: 4px;
+  }
+  .dpad button {
+    width: 47px;
+    height: 47px;
+    padding: 0;
+    font-size: 22px;
+    border-radius: 10px;
+  }
+  .touch-actions {
+    display: grid;
+    gap: 5px;
+  }
+  #touch-run,
+  #touch-jump {
+    width: 86px;
+    min-height: 47px;
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .controls {
+    right: 10px;
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 169px);
+    max-width: calc(100vw - 126px);
+    padding: 5px 7px;
+    gap: 3px;
+    border-radius: 7px;
+    background: #132b34cf;
+    backdrop-filter: blur(8px);
+  }
+  .controls > span { display: none !important; }
+  .controls button {
+    font-size: 10px;
+    padding: 5px 6px;
+    border-radius: 5px;
+  }
+  .controls kbd { display: none !important; }
+
+  #interaction {
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 228px);
+    max-width: calc(100vw - 20px);
+    padding: 7px 9px;
+    font-size: 11px;
+    border-radius: 7px;
+  }
+  #interact-touch {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  #toast {
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 228px);
+    max-width: calc(100vw - 20px);
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+
+  .landmark {
+    font-size: 9px;
+    padding: 4px 7px;
+  }
+  .landmark.target {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width: 390px) and (pointer: coarse) {
+  #vitals { width: 108px; }
+  .mission-panel { left: 128px; }
+  .mission-panel p { -webkit-line-clamp: 1; }
+  .dpad {
+    grid-template-columns: 44px 44px 44px;
+    grid-template-rows: 44px 44px;
+  }
+  .dpad button {
+    width: 44px;
+    height: 44px;
+  }
+  #touch-run,
+  #touch-jump {
+    width: 78px;
+    min-height: 44px;
+  }
+  .map-panel { width: 88px; }
+  .controls { max-width: calc(100vw - 108px); }
+}
