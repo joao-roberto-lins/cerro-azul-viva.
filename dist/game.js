@@ -172,9 +172,50 @@
   $('help').onclick=()=>openDialog('help-dialog');$('help-close').onclick=()=>closeDialog('help-dialog');$('pause-help').onclick=()=>openDialog('help-dialog');
   $('restart').onclick=()=>{if(coopActive){toast('Saia do grupo para recomeçar sua partida individual.');return;}closeDialog('pause-dialog');say('NOVO PASSEIO','Recomeçar do início?','Isso apaga o progresso salvo neste navegador e reinicia as '+missions.length+' missões.',[{label:'Sim, começar novamente',action:()=>{state=defaults();player.g.position.set(0,.31,65);save();location.reload();}}]);};
   $('photo-close').onclick=()=>closeDialog('photo-dialog');$('camera').onclick=setCamera;$('photo').onclick=takePhoto;$('map-toggle').onclick=toggleMap;$('interact-touch').onclick=interact;
+
+  // Mobile joystick + compact drawer: the gameplay canvas stays clear while secondary HUD lives behind one button.
+  const coarseMobile=()=>matchMedia('(pointer: coarse)').matches&&innerWidth<=580;
+  const mobileMenu=$('mobile-menu'),mobileDrawer=$('mobile-drawer'),mobileDrawerContent=$('mobile-drawer-content');
+  const mobileNodes=['.place-label','.map-panel','.player-panel','.controls','#online-launcher'].map(s=>document.querySelector(s)).filter(Boolean);
+  const mobileAnchors=new Map(mobileNodes.map(n=>{const a=document.createComment('mobile-hud-anchor');n.parentNode.insertBefore(a,n);return[n,a];}));
+  function setMobileDrawer(open){
+    if(!mobileDrawer)return;
+    mobileDrawer.hidden=!open;
+    document.body.classList.toggle('mobile-drawer-open',open);
+    mobileMenu?.setAttribute('aria-expanded',String(open));
+  }
+  function syncMobileHUD(){
+    if(!mobileDrawerContent)return;
+    if(coarseMobile()){
+      for(const n of mobileNodes) if(n.parentNode!==mobileDrawerContent) mobileDrawerContent.appendChild(n);
+      setMobileDrawer(false);
+    }else{
+      for(const n of mobileNodes){const a=mobileAnchors.get(n);if(a?.parentNode&&n.parentNode===mobileDrawerContent)a.parentNode.insertBefore(n,a.nextSibling);}
+      setMobileDrawer(false);
+    }
+  }
+  mobileMenu?.addEventListener('click',()=>setMobileDrawer(mobileDrawer.hidden));
+  $('mobile-drawer-close')?.addEventListener('click',()=>setMobileDrawer(false));
+  addEventListener('resize',syncMobileHUD);
+  syncMobileHUD();
+
+  let joystickPointer=null,joystickX=0,joystickY=0,joystickCx=0,joystickCy=0;
+  const joystick=$('mobile-joystick'),joystickKnob=joystick?.querySelector('span');
+  function resetJoystick(){
+    joystickPointer=null;joystickX=joystickY=0;
+    if(joystick){joystick.classList.remove('active');joystick.style.removeProperty('left');joystick.style.removeProperty('top');}
+    if(joystickKnob)joystickKnob.style.transform='translate(-50%,-50%)';
+  }
+  function moveJoystick(e){
+    if(e.pointerId!==joystickPointer||!joystick)return;
+    const max=44,dx=e.clientX-joystickCx,dy=e.clientY-joystickCy,len=Math.hypot(dx,dy)||1,scale=Math.min(1,max/len);
+    const px=dx*scale,py=dy*scale;
+    joystickX=px/max;joystickY=py/max;
+    if(joystickKnob)joystickKnob.style.transform=`translate(calc(-50% + ${px}px),calc(-50% + ${py}px))`;
+  }
   function jump(){if(!paused()&&state.transport==='walk'&&jumpHeight===0){jumpVelocity=6;}}
   $('touch-jump').onclick=jump;$('transport').onclick=()=>{if(!paused())adventure.transportMenu();};
-  for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(!paused())keys.add(b.dataset.key);};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.key);}
+  for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(!paused())keys.add(b.dataset.key);};b.onpointerup=b.onpointercancel=()=>{keys.delete(b.dataset.key);b.blur();};}
   addEventListener('keydown',e=>{
     if(e.target instanceof HTMLInputElement)return;if(typeof e.key!=='string')return;const key=e.key.toLowerCase();
     if(!paused()&&[' ','arrowup','arrowdown','arrowleft','arrowright'].includes(key))e.preventDefault();
@@ -200,8 +241,8 @@
   $('world').addEventListener('wheel',e=>{e.preventDefault();if(!paused())cameraDistance=clamp(cameraDistance+e.deltaY*.022,8,115);},{passive:false});
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
   function animatePerson(p,moving,time){const swing=moving?Math.sin(time*9)*.63:0;p.legs[0].rotation.x=swing;p.legs[1].rotation.x=-swing;p.arms[0].rotation.x=-swing*.7;p.arms[1].rotation.x=swing*.7;}
-  function updatePlayer(dt){const before=player.g.position.clone();let x=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0),z=(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);const manual=x!==0||z!==0;let dx=0,dz=0,running=false;
-    if(manual){autoPath=[];const len=Math.hypot(x,z);x/=len;z/=len;dx=x*Math.cos(cameraYaw)+z*Math.sin(cameraYaw);dz=z*Math.cos(cameraYaw)-x*Math.sin(cameraYaw);}else if(autoPath.length){let p=autoPath[0],d=Math.hypot(p.x-player.g.position.x,p.z-player.g.position.z);if(d<.42){autoPath.shift();p=autoPath[0];}if(p){d=Math.hypot(p.x-player.g.position.x,p.z-player.g.position.z);dx=(p.x-player.g.position.x)/Math.max(d,.001);dz=(p.z-player.g.position.z)/Math.max(d,.001);}}
+  function updatePlayer(dt){const before=player.g.position.clone();let x=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0),z=(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);if(Math.hypot(joystickX,joystickY)>.08){x=joystickX;z=joystickY;}const manual=Math.hypot(x,z)>.08;let dx=0,dz=0,running=false;
+    if(manual){autoPath=[];const len=Math.max(1,Math.hypot(x,z));x/=len;z/=len;dx=x*Math.cos(cameraYaw)+z*Math.sin(cameraYaw);dz=z*Math.cos(cameraYaw)-x*Math.sin(cameraYaw);}else if(autoPath.length){let p=autoPath[0],d=Math.hypot(p.x-player.g.position.x,p.z-player.g.position.z);if(d<.42){autoPath.shift();p=autoPath[0];}if(p){d=Math.hypot(p.x-player.g.position.x,p.z-player.g.position.z);dx=(p.x-player.g.position.x)/Math.max(d,.001);dz=(p.z-player.g.position.z)/Math.max(d,.001);}}
     const moving=dx!==0||dz!==0;running=moving&&keys.has('shift')&&state.energy>4&&!state.carrying&&state.transport==='walk';const desired=moving?(state.transport==='bike'?11:running?8:state.carrying?3.6:4.9):0;moveVelocity+=(desired-moveVelocity)*Math.min(1,dt*9);
     if(moving){const speed=Math.min(moveVelocity,autoPath.length?Math.hypot(autoPath[0].x-player.g.position.x,autoPath[0].z-player.g.position.z)/Math.max(dt,.001):moveVelocity),px=clamp(player.g.position.x+dx*speed*dt,-142,142),pz=clamp(player.g.position.z+dz*speed*dt,-142,142);if(!collides(px,player.g.position.z))player.g.position.x=px;if(!collides(player.g.position.x,pz))player.g.position.z=pz;const angle=Math.atan2(dx,dz),delta=Math.atan2(Math.sin(angle-player.g.rotation.y),Math.cos(angle-player.g.rotation.y));player.g.rotation.y+=delta*Math.min(1,dt*12);state.energy=clamp(state.energy+(running?-6:.3)*dt,0,100);}else state.energy=clamp(state.energy+2*dt,0,100);
     if(jumpVelocity!==0||jumpHeight>0){jumpVelocity-=18*dt;jumpHeight+=jumpVelocity*dt;if(jumpHeight<=0){jumpHeight=0;jumpVelocity=0;}}player.g.position.y=.31+jumpHeight;animatePerson(player,moving,elapsed*(running?1.35:.85));if(state.carrying){player.arms[0].rotation.x=-1;player.arms[1].rotation.x=-1;}
